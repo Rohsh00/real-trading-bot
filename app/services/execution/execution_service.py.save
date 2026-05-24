@@ -1,0 +1,34 @@
+
+kclear
+            side=execution_result["side"],
+            quantity=Decimal(
+                str(execution_result["quantity"])
+            ),
+            price=Decimal(
+                str(execution_result["price"])
+            ),
+            status="FILLED"
+        )
+
+        saved_order = await self.order_repo.create(
+            order
+        )
+
+        trade = Trade(
+            id=str(uuid4()),
+            order_id=saved_order.id,
+            symbol=execution_result["symbol"],
+            side=execution_result["side"],
+            quantity=Decimal(
+                str(execution_result["quantity"])
+            ),
+            price=Decimal(
+                str(execution_result["price"])
+            )
+        )
+
+        await self.trade_repo.create(
+            trade
+        )
+
+        return saved_order

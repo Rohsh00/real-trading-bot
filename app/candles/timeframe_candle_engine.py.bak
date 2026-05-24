@@ -1,0 +1,112 @@
+from collections import defaultdict
+from datetime import datetime
+
+from app.core.logger import logger
+
+
+class TimeframeCandleEngine:
+
+    candles = defaultdict(dict)
+
+    TIMEFRAMES = [
+        "1m",
+        "5m",
+        "15m"
+    ]
+
+    @classmethod
+    async def process_tick(
+        cls,
+        symbol,
+        price,
+        quantity=0
+    ):
+
+        for timeframe in cls.TIMEFRAMES:
+
+            key = f"{symbol}:{timeframe}"
+
+            candle = cls.candles.get(key)
+
+            if not candle:
+
+                cls.candles[key] = {
+                    "symbol": symbol,
+                    "timeframe": timeframe,
+                    "open": price,
+                    "high": price,
+                    "low": price,
+                    "close": price,
+                    "volume": quantity,
+                    "created_at":
+                        datetime.utcnow()
+                }
+
+            else:
+
+                candle["high"] = max(
+                    candle["high"],
+                    price
+                )
+
+                candle["low"] = min(
+                    candle["low"],
+                    price
+                )
+
+                candle["close"] = price
+
+                candle["volume"] += quantity
+
+            logger.info(
+                f"{key} Candle Updated"
+            )
+
+    @classmethod
+    def get_completed_candles(
+        cls
+    ):
+
+        completed = []
+
+        current_time = datetime.utcnow()
+
+        for key, candle in (
+            cls.candles.items()
+        ):
+
+            age = (
+                current_time
+                - candle["created_at"]
+            ).seconds
+
+            timeframe = candle["timeframe"]
+
+            should_close = False
+
+            if (
+                timeframe == "1m"
+                and age >= 60
+            ):
+
+                should_close = True
+
+            elif (
+                timeframe == "5m"
+                and age >= 300
+            ):
+
+                should_close = True
+
+            elif (
+                timeframe == "15m"
+                and age >= 900
+            ):
+
+                should_close = True
+
+            if should_close:
+
+                completed.append(candle)
+
+        return completed

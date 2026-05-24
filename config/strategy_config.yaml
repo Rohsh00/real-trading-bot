@@ -1,0 +1,15 @@
+symbols:
+  - BTCUSDT
+  - ETHUSDT
+  - SOLUSDT
+
+strategies:
+
+  BTCUSDT:
+    - ema
+
+  ETHUSDT:
+    - rsi
+
+  SOLUSDT:
+    - macd

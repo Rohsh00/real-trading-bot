@@ -1,0 +1,48 @@
+import asyncio
+
+import redis.asyncio as redis
+
+import orjson
+
+from app.execution.execution_engine import (
+    ExecutionEngine
+)
+
+from app.core.logger import logger
+
+
+async def main():
+
+    redis_client = redis.Redis(
+        host="localhost",
+        port=6379,
+        decode_responses=True
+    )
+
+    pubsub = redis_client.pubsub()
+
+    await pubsub.subscribe(
+        "trading_signals"
+    )
+
+    logger.info(
+        "Execution Engine Subscribed"
+    )
+
+    async for message in pubsub.listen():
+
+        if message["type"] != "message":
+            continue
+
+        signal = orjson.loads(
+            message["data"]
+        )
+
+        await ExecutionEngine.execute_signal(
+            signal
+        )
+
+
+if __name__ == "__main__":
+
+    asyncio.run(main())

@@ -1,0 +1,106 @@
+import yaml
+
+from app.portfolio.portfolio_manager import (
+    PortfolioManager
+)
+
+from app.risk.risk_manager import (
+    RiskManager
+)
+
+from app.brokers.factory.broker_factory import (
+    BrokerFactory
+)
+
+from app.core.logger import logger
+
+
+class ExecutionEngine:
+
+    DEFAULT_QUANTITY = 0.01
+
+    def __init__(self):
+
+        with open(
+            "config/broker_config.yaml",
+            "r"
+        ) as file:
+
+            config = yaml.safe_load(file)
+
+        broker_name = config["broker"]
+
+        self.broker = (
+            BrokerFactory.get_broker(
+                broker_name
+            )
+        )
+
+    async def execute_signal(
+        self,
+        signal: dict
+    ):
+
+        symbol = signal["symbol"]
+
+        side = signal["signal"]
+
+        price = signal["price"]
+
+        quantity = self.DEFAULT_QUANTITY
+
+        current_position = (
+            PortfolioManager.positions.get(symbol)
+        )
+
+        if side == "BUY" and current_position:
+
+            logger.info(
+                f"Already holding {symbol}"
+            )
+
+            return
+
+        if side == "SELL" and not current_position:
+
+            logger.info(
+                f"No open position for {symbol}"
+            )
+
+            return
+
+        is_allowed = (
+            await RiskManager.validate_order(
+                symbol=symbol,
+                quantity=quantity,
+                price=price
+            )
+        )
+
+        if not is_allowed:
+
+            logger.warning(
+                "Risk manager rejected order"
+            )
+
+            return
+
+        order = await self.broker.place_order(
+            symbol=symbol,
+            side=side,
+            quantity=quantity,
+            price=price
+        )
+
+        await PortfolioManager.update_position(
+            symbol=symbol,
+            side=side,
+            quantity=quantity,
+            price=price
+        )
+
+        logger.info(
+            f"Execution Complete: {order}"
+        )
+
+        return order

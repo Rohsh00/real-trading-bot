@@ -1,0 +1,41 @@
+import asyncio
+
+from app.candles.timeframe_candle_engine import (
+    TimeframeCandleEngine
+)
+
+from app.services.candle.candle_service import (
+    CandleService
+)
+
+from app.core.database import (
+    AsyncSessionLocal
+)
+
+async def main():
+
+    while True:
+
+        completed_candles = (
+            TimeframeCandleEngine
+            .get_completed_candles()
+        )
+
+        if completed_candles:
+
+            async with AsyncSessionLocal() as db:
+
+                service = CandleService(db)
+
+                for candle in completed_candles:
+
+                    await service.persist_candle(
+                        candle
+                    )
+
+        await asyncio.sleep(5)
+
+
+if __name__ == "__main__":
+
+    asyncio.run(main())
