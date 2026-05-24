@@ -22,6 +22,9 @@ import {
   fetchCandlesThunk,
   runBacktestThunk,
   deployStrategyThunk,
+  fetchSignalsThunk,
+  fetchOrdersThunk,
+  fetchBrokerStatusThunk,
   clearErrorMsg
 } from './store/tradingSlice';
 
@@ -40,6 +43,7 @@ function AppContent() {
     positions,
     strategies,
     backtest,
+    brokerStatus,
     isHealthOk,
     loading,
     errorMsg,
@@ -63,6 +67,9 @@ function AppContent() {
     } else if (activeTab === 'candles') {
       dispatch(fetchCandlesThunk({}));
     }
+    dispatch(fetchSignalsThunk());
+    dispatch(fetchOrdersThunk());
+    dispatch(fetchBrokerStatusThunk());
   }, [activeTab, dispatch]);
 
   // Auto refresh active data every 5 seconds
@@ -76,6 +83,9 @@ function AppContent() {
       } else if (activeTab === 'candles') {
         dispatch(fetchCandlesThunk({}));
       }
+      dispatch(fetchSignalsThunk());
+      dispatch(fetchOrdersThunk());
+      dispatch(fetchBrokerStatusThunk());
     }, 5000);
     return () => clearInterval(interval);
   }, [activeTab, dispatch]);
@@ -147,6 +157,7 @@ function AppContent() {
               'Billing subscription portals and user levels.'
             }
             isHealthOk={isHealthOk}
+            brokerStatus={brokerStatus}
             themeMode={themeMode}
             onToggleTheme={() => dispatch(toggleThemeMode())}
           />

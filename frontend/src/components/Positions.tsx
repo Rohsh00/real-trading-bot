@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import LayersIcon from '@mui/icons-material/Layers';
+import OrderLog from './OrderLog';
 
 interface Position {
   quantity: number;
@@ -28,12 +29,13 @@ export default function Positions({ positions, onRefresh }: PositionsProps) {
   const activePositions = Object.entries(positions);
 
   return (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
     <Card sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <LayersIcon color="primary" />
           <Typography variant="h6" sx={{ fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
-            Active DB-Persisted Positions
+            Live Portfolio Exposure
           </Typography>
         </Box>
         <Button 
@@ -54,7 +56,7 @@ export default function Positions({ positions, onRefresh }: PositionsProps) {
           align="center" 
           sx={{ py: 6 }}
         >
-          No active positions found in PostgreSQL database.
+          No active exposure. The quantitative engine is awaiting market signals.
         </Typography>
       ) : (
         <Box sx={{ overflowX: 'auto' }}>
@@ -83,5 +85,7 @@ export default function Positions({ positions, onRefresh }: PositionsProps) {
         </Box>
       )}
     </Card>
+    <OrderLog />
+    </Box>
   );
 }

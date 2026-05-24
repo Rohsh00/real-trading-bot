@@ -5,6 +5,7 @@ const defaultProps = {
   title: 'Test Title',
   subtitle: 'Test Subtitle',
   isHealthOk: true as const,
+  brokerStatus: null,
   themeMode: 'dark' as const,
   onToggleTheme: () => {},
 };

@@ -53,13 +53,13 @@ export default function StrategyHub({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
             <SettingsIcon color="primary" />
             <Typography variant="h6" sx={{ fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
-              Deployed Algorithmic Strategies
+              Active Algorithmic Strategies
             </Typography>
           </Box>
 
           {strategies.length === 0 ? (
             <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
-              No strategy classes found in database.
+              No active strategies found in the quantitative engine.
             </Typography>
           ) : (
             <Box sx={{ overflowX: 'auto' }}>
@@ -74,7 +74,16 @@ export default function StrategyHub({
                 </TableHead>
                 <TableBody>
                   {strategies.map((strategy) => (
-                    <TableRow key={strategy.id} hover>
+                    <TableRow 
+                      key={strategy.id} 
+                      hover
+                      onClick={() => {
+                        setStratName(strategy.name);
+                        setStratDesc(strategy.description);
+                        setStratConfig(JSON.stringify(strategy.config, null, 2));
+                      }}
+                      sx={{ cursor: 'pointer' }}
+                    >
                       <TableCell sx={{ fontWeight: 600 }}>{strategy.name}</TableCell>
                       <TableCell sx={{ color: 'text.secondary' }}>{strategy.description}</TableCell>
                       <TableCell>
@@ -106,14 +115,14 @@ export default function StrategyHub({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
             <PlusIcon color="primary" />
             <Typography variant="h6" sx={{ fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
-              Deploy Strategy
+              Deploy Quantitative Model
             </Typography>
           </Box>
 
           <form onSubmit={onSubmit}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <TextField
-                label="Strategy Name"
+                label="Model Name"
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -151,6 +160,42 @@ export default function StrategyHub({
                 }}
               />
 
+              <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ width: '100%', mb: 0.5 }}>
+                  Use Built-in Preset:
+                </Typography>
+                <Chip 
+                  label="EMA Crossover" 
+                  size="small" 
+                  onClick={() => {
+                    setStratName('EMA Trend Follower');
+                    setStratDesc('Standard EMA Crossover (5/10)');
+                    setStratConfig(JSON.stringify({ fast_period: 5, slow_period: 10 }, null, 2));
+                  }} 
+                  sx={{ cursor: 'pointer' }}
+                />
+                <Chip 
+                  label="MACD" 
+                  size="small" 
+                  onClick={() => {
+                    setStratName('MACD Oscillator');
+                    setStratDesc('MACD default settings');
+                    setStratConfig(JSON.stringify({ fast: 12, slow: 26, signal: 9 }, null, 2));
+                  }} 
+                  sx={{ cursor: 'pointer' }}
+                />
+                <Chip 
+                  label="RSI" 
+                  size="small" 
+                  onClick={() => {
+                    setStratName('RSI Reversion');
+                    setStratDesc('RSI oversold/overbought (14)');
+                    setStratConfig(JSON.stringify({ period: 14, overbought: 70, oversold: 30 }, null, 2));
+                  }} 
+                  sx={{ cursor: 'pointer' }}
+                />
+              </Box>
+
               <Button 
                 type="submit" 
                 variant="contained" 
@@ -159,7 +204,7 @@ export default function StrategyHub({
                 fullWidth
                 sx={{ mt: 1 }}
               >
-                Deploy Strategy
+                Deploy Quantitative Model
               </Button>
             </Box>
           </form>

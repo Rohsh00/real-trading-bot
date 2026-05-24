@@ -16,6 +16,10 @@ from app.services.position.position_service import (
     PositionService
 )
 
+from app.portfolio.portfolio_manager import (
+    PortfolioManager
+)
+
 
 class ExecutionService:
 

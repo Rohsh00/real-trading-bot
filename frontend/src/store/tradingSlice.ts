@@ -39,6 +39,35 @@ export interface BacktestResults {
   pnl_percentage: number;
 }
 
+export interface Signal {
+  strategy: string;
+  symbol: string;
+  signal: string;
+  price: number;
+  timestamp: string;
+}
+
+export interface Order {
+  id: string;
+  symbol: string;
+  side: string;
+  order_type: string;
+  quantity: number;
+  price: number;
+  status: string;
+  created_at: string | null;
+}
+
+export interface BrokerStatus {
+  broker: string;
+  mode: string;
+  is_paper: boolean;
+  risk_manager: {
+    max_position_size: number;
+    currency: string;
+  };
+}
+
 export interface TradingState {
   cashBalance: number;
   realizedPnl: number;
@@ -46,6 +75,9 @@ export interface TradingState {
   strategies: Strategy[];
   candles: Candle[];
   backtest: BacktestResults | null;
+  signals: Signal[];
+  orders: Order[];
+  brokerStatus: BrokerStatus | null;
   isHealthOk: boolean;
   loading: boolean;
   errorMsg: string | null;
@@ -58,6 +90,9 @@ const initialState: TradingState = {
   strategies: [],
   candles: [],
   backtest: null,
+  signals: [],
+  orders: [],
+  brokerStatus: null,
   isHealthOk: true,
   loading: false,
   errorMsg: null,
@@ -134,6 +169,48 @@ export const runBacktestThunk = createAsyncThunk(
       return await res.json();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Backtest server connection failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const fetchSignalsThunk = createAsyncThunk(
+  'trading/fetchSignals',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/signals/recent`);
+      if (!res.ok) throw new Error('Failed to fetch signals');
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown signals connection error';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const fetchOrdersThunk = createAsyncThunk(
+  'trading/fetchOrders',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/orders/recent`);
+      if (!res.ok) throw new Error('Failed to fetch orders');
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown orders connection error';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const fetchBrokerStatusThunk = createAsyncThunk(
+  'trading/fetchBrokerStatus',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/broker/status`);
+      if (!res.ok) throw new Error('Failed to fetch broker status');
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown broker status connection error';
       return rejectWithValue(message);
     }
   }
@@ -220,6 +297,18 @@ const tradingSlice = createSlice({
       })
       .addCase(deployStrategyThunk.rejected, (state, action) => {
         state.errorMsg = action.payload as string;
+      })
+      // Signals
+      .addCase(fetchSignalsThunk.fulfilled, (state, action) => {
+        state.signals = action.payload;
+      })
+      // Orders
+      .addCase(fetchOrdersThunk.fulfilled, (state, action) => {
+        state.orders = action.payload;
+      })
+      // Broker Status
+      .addCase(fetchBrokerStatusThunk.fulfilled, (state, action) => {
+        state.brokerStatus = action.payload;
       });
   },
 });

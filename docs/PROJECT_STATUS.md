@@ -162,25 +162,16 @@ Verification:
 
 # Active Services
 
-Terminal 1
+Unified Startup Script:
+`./start_backend.sh`
 
-python -m app.tasks.stream_runner
-
-Terminal 2
-
-python -m app.tasks.strategy_runner
-
-Terminal 3
-
-python -m app.tasks.execution_runner
-
-Terminal 4
-
-python -m app.tasks.candle_persistence_runner
-
-Terminal 5
-
-uvicorn app.main:app --reload
+This script manages all required background processes:
+- `app.tasks.stream_runner`
+- `app.tasks.candle_persistence_runner`
+- `app.tasks.strategy_runner`
+- `app.tasks.execution_runner`
+- `app.tasks.position_monitor`
+- `uvicorn app.main:app --reload`
 
 ---
 
@@ -564,10 +555,11 @@ Dashboard
 Tasks:
 
 - React + TypeScript Frontend
-- Live Charts (timeframe candlestick visualization)
+- Live Charts (timeframe candlestick visualization via WebSocket)
 - Portfolio Screen (live database positions)
 - Strategies Hub (form deployment and listings)
 - SaaS Plan & Tenant switcher
+- **Full Backend Data Wiring** (Orders, Signals, Broker Status)
 
 Status:
 
@@ -577,6 +569,8 @@ Rebuild details:
 - Converted dashboard layout to official Material-UI (MUI) design system.
 - Created custom theme (`theme.ts`) supporting sleek dark mode aesthetics.
 - Refactored frontend into modular, reusable components inside `src/components/`.
+- Resolved all flicker/rendering issues with `lightweight-charts` by porting to WebSocket real-time ticks.
+- Wired all backend systems: Signals feed, Execution log, Broker Mode indicator, and Strategy presets.
 - Ensured strict typing and resolved all TypeScript compilation issues (`npm run build` succeeds).
 - Cleaned up lint warnings/errors to achieve clean ESLint execution (`npm run lint` with zero warnings).
 

@@ -3,6 +3,9 @@ from fastapi import FastAPI
 from app.api.health import router as health_router
 from app.api.strategy import router as strategy_router
 from app.api.portfolio import router as portfolio_router
+from app.api.signals import router as signals_router
+from app.api.orders import router as orders_router
+from app.api.broker import router as broker_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -61,6 +64,21 @@ app.include_router(
 
 app.include_router(
     portfolio_router,
+    prefix="/api/v1"
+)
+
+app.include_router(
+    signals_router,
+    prefix="/api/v1"
+)
+
+app.include_router(
+    orders_router,
+    prefix="/api/v1"
+)
+
+app.include_router(
+    broker_router,
     prefix="/api/v1"
 )
 

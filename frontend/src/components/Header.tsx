@@ -4,10 +4,13 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
+import { BrokerStatus } from '../store/tradingSlice';
+
 interface HeaderProps {
   title: string;
   subtitle: string;
   isHealthOk: boolean;
+  brokerStatus: BrokerStatus | null;
   themeMode: 'light' | 'dark';
   onToggleTheme: () => void;
 }
@@ -16,6 +19,7 @@ export default function Header({
   title, 
   subtitle, 
   isHealthOk, 
+  brokerStatus,
   themeMode, 
   onToggleTheme 
 }: HeaderProps) {
@@ -51,6 +55,17 @@ export default function Header({
             {themeMode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
           </IconButton>
         </Tooltip>
+
+        {brokerStatus && (
+          <Tooltip title={`Risk Manager Max Size: $${brokerStatus.risk_manager.max_position_size.toLocaleString()}`}>
+            <Chip
+              label={brokerStatus.mode}
+              color={brokerStatus.is_paper ? 'primary' : 'secondary'}
+              variant="outlined"
+              sx={{ fontWeight: 600, borderRadius: '20px' }}
+            />
+          </Tooltip>
+        )}
 
         <Tooltip title={isHealthOk ? "FastAPI connection active" : "FastAPI connection offline"}>
           <Chip

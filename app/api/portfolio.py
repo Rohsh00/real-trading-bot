@@ -30,13 +30,11 @@ async def get_portfolio(
         for pos in positions
     }
 
+    cash_balance = await PortfolioManager.get_cash_balance()
+    realized_pnl = await PortfolioManager.get_realized_pnl()
+
     return {
-        "cash_balance":
-            PortfolioManager.cash_balance,
-
-        "positions":
-            positions_dict,
-
-        "realized_pnl":
-            PortfolioManager.realized_pnl
+        "cash_balance": cash_balance,
+        "positions": positions_dict,
+        "realized_pnl": realized_pnl
     }

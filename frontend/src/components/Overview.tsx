@@ -19,6 +19,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import LayersIcon from '@mui/icons-material/Layers';
 import SettingsIcon from '@mui/icons-material/Settings';
+import SignalsFeed from './SignalsFeed';
 
 interface Position {
   quantity: number;
@@ -144,13 +145,13 @@ export default function Overview({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <LayersIcon color="primary" />
               <Typography variant="h6" sx={{ fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
-                Open Positions
+                Active Market Exposure
               </Typography>
             </Box>
             
             {activePositionsCount === 0 ? (
               <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
-                No active positions found in database. Run a signal to place a trade.
+                No active exposure. The quantitative engine is awaiting market signals.
               </Typography>
             ) : (
               <Box sx={{ overflowX: 'auto' }}>
@@ -187,7 +188,7 @@ export default function Overview({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <SettingsIcon color="success" />
               <Typography variant="h6" sx={{ fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
-                Active SaaS Status
+                System Infrastructure Health
               </Typography>
             </Box>
             
@@ -229,6 +230,11 @@ export default function Overview({
               </ListItem>
             </List>
           </Card>
+        </Grid>
+
+        {/* Signals Feed Panel */}
+        <Grid size={{ xs: 12 }}>
+          <SignalsFeed />
         </Grid>
       </Grid>
     </Box>
