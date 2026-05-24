@@ -1,8 +1,10 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useMemo } from 'react';
+import { Provider } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Alert, Container } from '@mui/material';
 
-import { theme } from './theme';
+import { store, useAppDispatch, useAppSelector } from './store';
+import { getTheme } from './theme';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Overview from './components/Overview';
@@ -12,181 +14,95 @@ import Candles from './components/Candles';
 import Backtesting from './components/Backtesting';
 import Billing from './components/Billing';
 
-// API Base URL
-const API_BASE = 'http://localhost:8000/api/v1';
+import { toggleThemeMode, setActiveTab, setTenant, TabType } from './store/appSlice';
+import {
+  fetchPortfolioThunk,
+  fetchStrategiesThunk,
+  fetchHealthThunk,
+  fetchCandlesThunk,
+  runBacktestThunk,
+  deployStrategyThunk,
+  clearErrorMsg
+} from './store/tradingSlice';
 
-// Interfaces
-interface Position {
-  quantity: number;
-  average_price: number;
-  stop_loss: number;
-  take_profit: number;
-}
+function AppContent() {
+  const dispatch = useAppDispatch();
 
-interface Strategy {
-  id: string;
-  name: string;
-  description: string;
-  config: Record<string, unknown>;
-  is_active: boolean;
-}
+  // App Settings from Redux
+  const themeMode = useAppSelector((state) => state.app.themeMode);
+  const activeTab = useAppSelector((state) => state.app.activeTab) as TabType;
+  const tenant = useAppSelector((state) => state.app.tenant);
 
-interface Candle {
-  symbol: string;
-  timeframe: string;
-  timestamp: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-}
+  // Trading States from Redux
+  const {
+    cashBalance,
+    realizedPnl,
+    positions,
+    strategies,
+    candles,
+    backtest,
+    isHealthOk,
+    loading,
+    errorMsg,
+  } = useAppSelector((state) => state.trading);
 
-interface BacktestResults {
-  total_trades: number;
-  winning_trades: number;
-  losing_trades: number;
-  win_rate: number;
-  starting_balance: number;
-  final_balance: number;
-  total_pnl: number;
-  pnl_percentage: number;
-}
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'positions' | 'strategies' | 'candles' | 'backtest' | 'billing'>('overview');
-  const [tenant, setTenant] = useState<string>('trader-standard');
-  const [cashBalance, setCashBalance] = useState<number>(100000.0);
-  const [realizedPnl, setRealizedPnl] = useState<number>(0.0);
-  
-  // Data States
-  const [positions, setPositions] = useState<Record<string, Position>>({});
-  const [strategies, setStrategies] = useState<Strategy[]>([]);
-  const [candles, setCandles] = useState<Candle[]>([]);
-  const [backtest, setBacktest] = useState<BacktestResults | null>(null);
-  
-  // Status States
-  const [isHealthOk, setIsHealthOk] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
   // Form State
   const [stratName, setStratName] = useState('');
   const [stratDesc, setStratDesc] = useState('');
   const [stratConfig, setStratConfig] = useState('{\n  "ema_short": 12,\n  "ema_long": 26\n}');
 
-  // Fetch Core Portfolio Details
-  const fetchPortfolio = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/portfolio`);
-      if (res.ok) {
-        const data = await res.json();
-        setPositions(data.positions || {});
-        setCashBalance(data.cash_balance ?? 100000.0);
-        setRealizedPnl(data.realized_pnl ?? 0.0);
-      }
-    } catch (err) {
-      console.error("Error fetching portfolio: ", err);
+  // Sync active tab data on change
+  useEffect(() => {
+    dispatch(fetchHealthThunk());
+    if (activeTab === 'overview') {
+      dispatch(fetchPortfolioThunk());
+      dispatch(fetchStrategiesThunk());
+    } else if (activeTab === 'positions') {
+      dispatch(fetchPortfolioThunk());
+    } else if (activeTab === 'strategies') {
+      dispatch(fetchStrategiesThunk());
+    } else if (activeTab === 'candles') {
+      dispatch(fetchCandlesThunk());
     }
-  };
+  }, [activeTab, dispatch]);
 
-  // Fetch Strategies
-  const fetchStrategies = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/strategies`);
-      if (res.ok) {
-        const data = await res.json();
-        setStrategies(data);
+  // Auto refresh active data every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch(fetchHealthThunk());
+      if (activeTab === 'overview') {
+        dispatch(fetchPortfolioThunk());
+      } else if (activeTab === 'positions') {
+        dispatch(fetchPortfolioThunk());
+      } else if (activeTab === 'candles') {
+        dispatch(fetchCandlesThunk());
       }
-    } catch (err) {
-      console.error("Error fetching strategies: ", err);
-    }
-  };
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeTab, dispatch]);
 
-  // Fetch Health Status
-  const fetchHealth = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/health`);
-      setIsHealthOk(res.ok);
-    } catch (err) {
-      setIsHealthOk(false);
-    }
-  };
-
-  // Run Backtest
-  const runBacktestEngine = async () => {
-    setLoading(true);
-    setErrorMsg(null);
-    try {
-      const res = await fetch(`${API_BASE}/backtest`);
-      if (res.ok) {
-        const data = await res.json();
-        setBacktest(data);
-      } else {
-        setErrorMsg("Failed to run backtest. Ensure sample CSV data is present.");
-      }
-    } catch (err) {
-      setErrorMsg("Connection to backtest server failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch Candles
-  const fetchCandles = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/candles?symbol=BTCUSDT&timeframe=1m&limit=15`);
-      if (res.ok) {
-        const data = await res.json();
-        setCandles(data);
-      }
-    } catch (err) {
-      console.error("Error fetching candles: ", err);
-    }
-  };
+  // Dynamic theme builder based on mode
+  const theme = useMemo(() => getTheme(themeMode), [themeMode]);
 
   // Create Strategy
   const handleCreateStrategy = async (e: FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
     try {
       const parsedConfig = JSON.parse(stratConfig);
-      const res = await fetch(`${API_BASE}/strategies`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await dispatch(
+        deployStrategyThunk({
           name: stratName,
           description: stratDesc,
-          config: parsedConfig
+          config: parsedConfig,
         })
-      });
-      if (res.ok) {
-        setStratName('');
-        setStratDesc('');
-        fetchStrategies();
-      } else {
-        const data = await res.json();
-        setErrorMsg(data.message || "Failed to create strategy.");
-      }
-    } catch (err) {
-      setErrorMsg("Invalid JSON config format or network error.");
+      ).unwrap();
+
+      setStratName('');
+      setStratDesc('');
+    } catch {
+      // Errors are set to Redux errorMsg automatically by the extraReducer
     }
   };
-
-  // On Load Sync
-  useEffect(() => {
-    fetchPortfolio();
-    fetchStrategies();
-    fetchHealth();
-    fetchCandles();
-    
-    // Auto refresh every 5 seconds
-    const interval = setInterval(() => {
-      fetchPortfolio();
-      fetchHealth();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -195,9 +111,9 @@ export default function App() {
         {/* Sidebar Panel */}
         <Sidebar 
           activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
+          setActiveTab={(tab) => dispatch(setActiveTab(tab as TabType))} 
           tenant={tenant} 
-          setTenant={setTenant} 
+          setTenant={(t) => dispatch(setTenant(t))} 
         />
 
         {/* Main Panel Content Container */}
@@ -232,11 +148,13 @@ export default function App() {
               'Billing subscription portals and user levels.'
             }
             isHealthOk={isHealthOk}
+            themeMode={themeMode}
+            onToggleTheme={() => dispatch(toggleThemeMode())}
           />
 
           {/* Error alerts banner */}
           {errorMsg && (
-            <Alert severity="error" onClose={() => setErrorMsg(null)} sx={{ borderRadius: 2 }}>
+            <Alert severity="error" onClose={() => dispatch(clearErrorMsg())} sx={{ borderRadius: 2 }}>
               {errorMsg}
             </Alert>
           )}
@@ -256,7 +174,7 @@ export default function App() {
             {activeTab === 'positions' && (
               <Positions 
                 positions={positions} 
-                onRefresh={fetchPortfolio} 
+                onRefresh={() => dispatch(fetchPortfolioThunk())} 
               />
             )}
 
@@ -281,7 +199,7 @@ export default function App() {
               <Backtesting 
                 loading={loading} 
                 backtest={backtest} 
-                onExecute={runBacktestEngine} 
+                onExecute={() => dispatch(runBacktestThunk())} 
               />
             )}
 
@@ -292,5 +210,13 @@ export default function App() {
         </Box>
       </Box>
     </ThemeProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
   );
 }

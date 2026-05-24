@@ -35,8 +35,11 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-        backgroundColor: '#0b0f19',
+        // ✅ Theme-aware: uses MUI divider color token instead of hardcoded dark rgba
+        borderRight: '1px solid',
+        borderColor: 'divider',
+        // ✅ Theme-aware: uses MUI paper background so it switches with light/dark
+        backgroundColor: 'background.paper',
         padding: '24px',
       }}
     >
@@ -63,9 +66,8 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
             fontWeight: 700,
             fontSize: '20px',
             letterSpacing: '-0.5px',
-            background: 'linear-gradient(to right, #ffffff, #9ca3af)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            // ✅ Theme-aware: primary text color instead of hardcoded dark gradient
+            color: 'text.primary',
           }}
         >
           Antigravity SaaS
@@ -156,8 +158,8 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
             value={tenant}
             onChange={(e) => setTenant(e.target.value as string)}
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              borderColor: 'rgba(255, 255, 255, 0.08)',
+              // ✅ Theme-aware: uses theme action hover alpha instead of hardcoded dark rgba
+              backgroundColor: 'action.hover',
               fontSize: '13px',
               borderRadius: 2,
             }}
