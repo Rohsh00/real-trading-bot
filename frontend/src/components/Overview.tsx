@@ -37,13 +37,15 @@ interface OverviewProps {
   tenant: string;
 }
 
-export default function Overview({ 
+import React from 'react';
+
+const Overview: React.FC<OverviewProps> = React.memo(({ 
   cashBalance, 
   realizedPnl, 
   positions, 
   strategiesCount, 
   tenant 
-}: OverviewProps) {
+}) => {
   const activePositionsCount = Object.keys(positions).length;
 
   return (
@@ -244,4 +246,6 @@ export default function Overview({
       </Grid>
     </Box>
   );
-}
+});
+
+export default Overview;

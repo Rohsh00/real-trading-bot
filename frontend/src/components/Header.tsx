@@ -6,6 +6,8 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 import { BrokerStatus } from '../store/tradingSlice';
 
+import React from 'react';
+
 interface HeaderProps {
   title: string;
   subtitle: string;
@@ -15,14 +17,14 @@ interface HeaderProps {
   onToggleTheme: () => void;
 }
 
-export default function Header({ 
+const Header: React.FC<HeaderProps> = React.memo(({ 
   title, 
   subtitle, 
   isHealthOk, 
   brokerStatus,
   themeMode, 
   onToggleTheme 
-}: HeaderProps) {
+}) => {
   return (
     <Box 
       sx={{
@@ -87,4 +89,6 @@ export default function Header({
       </Box>
     </Box>
   );
-}
+});
+
+export default Header;

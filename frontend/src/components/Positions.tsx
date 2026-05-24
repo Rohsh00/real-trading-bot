@@ -26,7 +26,9 @@ interface PositionsProps {
   onRefresh: () => void;
 }
 
-export default function Positions({ positions, onRefresh }: PositionsProps) {
+import React from 'react';
+
+const Positions: React.FC<PositionsProps> = React.memo(({ positions, onRefresh }) => {
   const activePositions = Object.entries(positions);
 
   return (
@@ -93,4 +95,6 @@ export default function Positions({ positions, onRefresh }: PositionsProps) {
     <OrderLog />
     </Box>
   );
-}
+});
+
+export default Positions;

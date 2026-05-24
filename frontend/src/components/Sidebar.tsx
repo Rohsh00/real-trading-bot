@@ -21,6 +21,8 @@ import UsersIcon from '@mui/icons-material/People';
 import { useTranslation } from 'react-i18next';
 import { TabEnum } from '../types/enums';
 
+import React from 'react';
+
 interface SidebarProps {
   activeTab: TabEnum;
   setActiveTab: (tab: TabEnum) => void;
@@ -28,7 +30,7 @@ interface SidebarProps {
   setTenant: (tenant: string) => void;
 }
 
-export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: SidebarProps) {
+const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, setActiveTab, tenant, setTenant }) => {
   const { t } = useTranslation();
 
   return (
@@ -176,4 +178,6 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
       </Box>
     </Box>
   );
-}
+});
+
+export default Sidebar;
