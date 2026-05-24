@@ -18,15 +18,19 @@ import LayersIcon from '@mui/icons-material/Layers';
 import PlayIcon from '@mui/icons-material/PlayArrow';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import UsersIcon from '@mui/icons-material/People';
+import { useTranslation } from 'react-i18next';
+import { TabEnum } from '../types/enums';
 
 interface SidebarProps {
-  activeTab: 'overview' | 'positions' | 'strategies' | 'candles' | 'backtest' | 'billing';
-  setActiveTab: (tab: 'overview' | 'positions' | 'strategies' | 'candles' | 'backtest' | 'billing') => void;
+  activeTab: TabEnum;
+  setActiveTab: (tab: TabEnum) => void;
   tenant: string;
   setTenant: (tenant: string) => void;
 }
 
 export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: SidebarProps) {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -70,76 +74,76 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
             color: 'text.primary',
           }}
         >
-          Antigravity SaaS
+          {t('brand.name')}
         </Typography>
       </Box>
 
       {/* Navigation List */}
       <List component="nav" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <ListItemButton
-          selected={activeTab === 'overview'}
-          onClick={() => setActiveTab('overview')}
+          selected={activeTab === TabEnum.OVERVIEW}
+          onClick={() => setActiveTab(TabEnum.OVERVIEW)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'overview' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.OVERVIEW ? 'primary.main' : 'text.secondary' }}>
             <ActivityIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Overview" />
+          <ListItemText primary={t('sidebar.tabs.overview')} />
         </ListItemButton>
 
         <ListItemButton
-          selected={activeTab === 'positions'}
-          onClick={() => setActiveTab('positions')}
+          selected={activeTab === TabEnum.POSITIONS}
+          onClick={() => setActiveTab(TabEnum.POSITIONS)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'positions' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.POSITIONS ? 'primary.main' : 'text.secondary' }}>
             <LayersIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Open Positions" />
+          <ListItemText primary={t('sidebar.tabs.positions')} />
         </ListItemButton>
 
         <ListItemButton
-          selected={activeTab === 'strategies'}
-          onClick={() => setActiveTab('strategies')}
+          selected={activeTab === TabEnum.STRATEGIES}
+          onClick={() => setActiveTab(TabEnum.STRATEGIES)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'strategies' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.STRATEGIES ? 'primary.main' : 'text.secondary' }}>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Strategy Hub" />
+          <ListItemText primary={t('sidebar.tabs.strategies')} />
         </ListItemButton>
 
         <ListItemButton
-          selected={activeTab === 'candles'}
-          onClick={() => setActiveTab('candles')}
+          selected={activeTab === TabEnum.CANDLES}
+          onClick={() => setActiveTab(TabEnum.CANDLES)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'candles' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.CANDLES ? 'primary.main' : 'text.secondary' }}>
             <LineChartIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Live Charts" />
+          <ListItemText primary={t('sidebar.tabs.candles')} />
         </ListItemButton>
 
         <ListItemButton
-          selected={activeTab === 'backtest'}
-          onClick={() => setActiveTab('backtest')}
+          selected={activeTab === TabEnum.BACKTEST}
+          onClick={() => setActiveTab(TabEnum.BACKTEST)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'backtest' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.BACKTEST ? 'primary.main' : 'text.secondary' }}>
             <PlayIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Backtesting" />
+          <ListItemText primary={t('sidebar.tabs.backtest')} />
         </ListItemButton>
 
         <ListItemButton
-          selected={activeTab === 'billing'}
-          onClick={() => setActiveTab('billing')}
+          selected={activeTab === TabEnum.BILLING}
+          onClick={() => setActiveTab(TabEnum.BILLING)}
           sx={{ borderRadius: 2 }}
         >
-          <ListItemIcon sx={{ minWidth: 40, color: activeTab === 'billing' ? 'primary.main' : 'text.secondary' }}>
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.BILLING ? 'primary.main' : 'text.secondary' }}>
             <CreditCardIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="SaaS Billing" />
+          <ListItemText primary={t('sidebar.tabs.billing')} />
         </ListItemButton>
       </List>
 
@@ -150,7 +154,7 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
           <UsersIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
           <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: '0.5px' }} color="text.secondary">
-            TENANT ACCOUNT
+            {t('sidebar.tenant')}
           </Typography>
         </Box>
         <FormControl fullWidth size="small">
@@ -164,9 +168,9 @@ export default function Sidebar({ activeTab, setActiveTab, tenant, setTenant }: 
               borderRadius: 2,
             }}
           >
-            <MenuItem value="trader-standard">Standard Tier (User #104)</MenuItem>
-            <MenuItem value="trader-pro">Pro Tier (User #022)</MenuItem>
-            <MenuItem value="trader-institution">Institutional (User #001)</MenuItem>
+            <MenuItem value="trader-standard">{t('sidebar.tiers.standard')}</MenuItem>
+            <MenuItem value="trader-pro">{t('sidebar.tiers.pro')}</MenuItem>
+            <MenuItem value="trader-institution">{t('sidebar.tiers.institutional')}</MenuItem>
           </Select>
         </FormControl>
       </Box>

@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Alert, Container } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 import { store, useAppDispatch, useAppSelector } from './store';
 import { getTheme } from './theme';
@@ -14,25 +15,19 @@ import Candles from './components/Candles';
 import Backtesting from './components/Backtesting';
 import Billing from './components/Billing';
 
-import { toggleThemeMode, setActiveTab, setTenant, TabType } from './store/appSlice';
-import {
-  fetchPortfolioThunk,
-  fetchStrategiesThunk,
-  fetchHealthThunk,
-  fetchCandlesThunk,
-  runBacktestThunk,
-  fetchSignalsThunk,
-  fetchOrdersThunk,
-  fetchBrokerStatusThunk,
-  clearErrorMsg
-} from './store/tradingSlice';
+import { toggleThemeMode, setActiveTab, setTenant } from './store/appSlice';
+import { clearErrorMsg, fetchPortfolioThunk, runBacktestThunk } from './store/tradingSlice';
+import { TabEnum } from './types/enums';
+import { getHeaderTitle, getHeaderSubtitle } from './utils/helpers';
+import { useTradingData } from './hooks/useTradingData';
 
 function AppContent() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   // App Settings from Redux
   const themeMode = useAppSelector((state) => state.app.themeMode);
-  const activeTab = useAppSelector((state) => state.app.activeTab) as TabType;
+  const activeTab = useAppSelector((state) => state.app.activeTab);
   const tenant = useAppSelector((state) => state.app.tenant);
 
   // Trading States from Redux
@@ -48,44 +43,49 @@ function AppContent() {
     errorMsg,
   } = useAppSelector((state) => state.trading);
 
-  // Sync active tab data on change
-  useEffect(() => {
-    dispatch(fetchHealthThunk());
-    if (activeTab === 'overview') {
-      dispatch(fetchPortfolioThunk());
-      dispatch(fetchStrategiesThunk());
-    } else if (activeTab === 'positions') {
-      dispatch(fetchPortfolioThunk());
-    } else if (activeTab === 'strategies') {
-      dispatch(fetchStrategiesThunk());
-    } else if (activeTab === 'candles') {
-      dispatch(fetchCandlesThunk({}));
-    }
-    dispatch(fetchSignalsThunk());
-    dispatch(fetchOrdersThunk());
-    dispatch(fetchBrokerStatusThunk());
-  }, [activeTab, dispatch]);
-
-  // Auto refresh active data every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      dispatch(fetchHealthThunk());
-      if (activeTab === 'overview') {
-        dispatch(fetchPortfolioThunk());
-      } else if (activeTab === 'positions') {
-        dispatch(fetchPortfolioThunk());
-      } else if (activeTab === 'candles') {
-        dispatch(fetchCandlesThunk({}));
-      }
-      dispatch(fetchSignalsThunk());
-      dispatch(fetchOrdersThunk());
-      dispatch(fetchBrokerStatusThunk());
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [activeTab, dispatch]);
+  // Initialize data fetching and auto-refresh intervals
+  useTradingData(activeTab);
 
   // Dynamic theme builder based on mode
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
+
+  const renderActiveTabComponent = () => {
+    switch (activeTab) {
+      case TabEnum.OVERVIEW:
+        return (
+          <Overview 
+            cashBalance={cashBalance}
+            realizedPnl={realizedPnl}
+            positions={positions}
+            strategiesCount={strategies.length}
+            tenant={tenant}
+          />
+        );
+      case TabEnum.POSITIONS:
+        return (
+          <Positions 
+            positions={positions} 
+            onRefresh={() => dispatch(fetchPortfolioThunk())} 
+          />
+        );
+      case TabEnum.STRATEGIES:
+        return <StrategyHub strategies={strategies} />;
+      case TabEnum.CANDLES:
+        return <Candles />;
+      case TabEnum.BACKTEST:
+        return (
+          <Backtesting 
+            loading={loading} 
+            backtest={backtest} 
+            onExecute={() => dispatch(runBacktestThunk())} 
+          />
+        );
+      case TabEnum.BILLING:
+        return <Billing tenant={tenant} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -94,7 +94,7 @@ function AppContent() {
         {/* Sidebar Panel */}
         <Sidebar 
           activeTab={activeTab} 
-          setActiveTab={(tab) => dispatch(setActiveTab(tab as TabType))} 
+          setActiveTab={(tab) => dispatch(setActiveTab(tab))} 
           tenant={tenant} 
           setTenant={(t) => dispatch(setTenant(t))} 
         />
@@ -114,22 +114,8 @@ function AppContent() {
         >
           {/* Header section */}
           <Header 
-            title={
-              activeTab === 'overview' ? 'SaaS Dashboard' :
-              activeTab === 'positions' ? 'Open Positions' :
-              activeTab === 'strategies' ? 'Strategy Hub' :
-              activeTab === 'candles' ? 'Live Candles' :
-              activeTab === 'backtest' ? 'Backtesting Lab' :
-              'Premium SaaS Plans'
-            }
-            subtitle={
-              activeTab === 'overview' ? 'Real-time multi-user trading platform metrics.' :
-              activeTab === 'positions' ? 'Inspect active, database-persisted trades.' :
-              activeTab === 'strategies' ? 'Manage and deploy algorithmic trading strategies.' :
-              activeTab === 'candles' ? 'View websocket stream timeframe candles.' :
-              activeTab === 'backtest' ? 'Evaluate strategy historical performance.' :
-              'Billing subscription portals and user levels.'
-            }
+            title={t(getHeaderTitle(activeTab))}
+            subtitle={t(getHeaderSubtitle(activeTab))}
             isHealthOk={isHealthOk}
             brokerStatus={brokerStatus}
             themeMode={themeMode}
@@ -145,42 +131,7 @@ function AppContent() {
 
           {/* Main Dashboard Pages */}
           <Container maxWidth="xl" disableGutters sx={{ display: 'flex', flexDirection: 'column', gap: 3, flexGrow: 1 }}>
-            {activeTab === 'overview' && (
-              <Overview 
-                cashBalance={cashBalance}
-                realizedPnl={realizedPnl}
-                positions={positions}
-                strategiesCount={strategies.length}
-                tenant={tenant}
-              />
-            )}
-
-            {activeTab === 'positions' && (
-              <Positions 
-                positions={positions} 
-                onRefresh={() => dispatch(fetchPortfolioThunk())} 
-              />
-            )}
-
-            {activeTab === 'strategies' && (
-              <StrategyHub strategies={strategies} />
-            )}
-
-            {activeTab === 'candles' && (
-              <Candles />
-            )}
-
-            {activeTab === 'backtest' && (
-              <Backtesting 
-                loading={loading} 
-                backtest={backtest} 
-                onExecute={() => dispatch(runBacktestThunk())} 
-              />
-            )}
-
-            {activeTab === 'billing' && (
-              <Billing tenant={tenant} />
-            )}
+            {renderActiveTabComponent()}
           </Container>
         </Box>
       </Box>

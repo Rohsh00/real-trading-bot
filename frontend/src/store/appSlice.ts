@@ -1,16 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export type TabType = 'overview' | 'positions' | 'strategies' | 'candles' | 'backtest' | 'billing';
+import { TabEnum } from '../types/enums';
 
 export interface AppState {
   themeMode: 'light' | 'dark';
-  activeTab: TabType;
+  activeTab: TabEnum;
   tenant: string;
 }
 
 const initialState: AppState = {
   themeMode: 'dark',
-  activeTab: 'overview',
+  activeTab: TabEnum.OVERVIEW,
   tenant: 'trader-standard',
 };
 
@@ -24,7 +23,7 @@ const appSlice = createSlice({
     setThemeMode(state, action: PayloadAction<'light' | 'dark'>) {
       state.themeMode = action.payload;
     },
-    setActiveTab(state, action: PayloadAction<TabType>) {
+    setActiveTab(state, action: PayloadAction<TabEnum>) {
       state.activeTab = action.payload;
     },
     setTenant(state, action: PayloadAction<string>) {
