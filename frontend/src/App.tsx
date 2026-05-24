@@ -39,7 +39,6 @@ function AppContent() {
     realizedPnl,
     positions,
     strategies,
-    candles,
     backtest,
     isHealthOk,
     loading,
@@ -62,7 +61,7 @@ function AppContent() {
     } else if (activeTab === 'strategies') {
       dispatch(fetchStrategiesThunk());
     } else if (activeTab === 'candles') {
-      dispatch(fetchCandlesThunk());
+      dispatch(fetchCandlesThunk({}));
     }
   }, [activeTab, dispatch]);
 
@@ -75,7 +74,7 @@ function AppContent() {
       } else if (activeTab === 'positions') {
         dispatch(fetchPortfolioThunk());
       } else if (activeTab === 'candles') {
-        dispatch(fetchCandlesThunk());
+        dispatch(fetchCandlesThunk({}));
       }
     }, 5000);
     return () => clearInterval(interval);
@@ -192,7 +191,7 @@ function AppContent() {
             )}
 
             {activeTab === 'candles' && (
-              <Candles candles={candles} />
+              <Candles />
             )}
 
             {activeTab === 'backtest' && (

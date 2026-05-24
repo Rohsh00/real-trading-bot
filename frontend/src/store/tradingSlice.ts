@@ -106,9 +106,16 @@ export const fetchHealthThunk = createAsyncThunk(
 
 export const fetchCandlesThunk = createAsyncThunk(
   'trading/fetchCandles',
-  async (_, { rejectWithValue }) => {
+  async (
+    params: { symbol?: string; timeframe?: string } = {},
+    { rejectWithValue }
+  ) => {
+    const symbol = params.symbol ?? 'BTCUSDT';
+    const timeframe = params.timeframe ?? '1m';
     try {
-      const res = await fetch(`${API_BASE}/candles?symbol=BTCUSDT&timeframe=1m&limit=15`);
+      const res = await fetch(
+        `${API_BASE}/candles?symbol=${symbol}&timeframe=${timeframe}&limit=50`
+      );
       if (!res.ok) throw new Error('Failed to fetch candles');
       return await res.json();
     } catch (err: unknown) {
