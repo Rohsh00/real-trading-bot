@@ -31,6 +31,16 @@ async def main():
 
     strategy_manager = StrategyManager()
 
+    async def sync_loop():
+        while True:
+            try:
+                await strategy_manager.sync_strategies()
+            except Exception as e:
+                logger.error(f"Strategy Sync Error: {e}")
+            await asyncio.sleep(5)
+
+    asyncio.create_task(sync_loop())
+
     while True:
 
         message = await pubsub.get_message(

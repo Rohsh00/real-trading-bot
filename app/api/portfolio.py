@@ -25,7 +25,8 @@ async def get_portfolio(
             "quantity": pos.quantity,
             "average_price": pos.average_price,
             "stop_loss": pos.stop_loss,
-            "take_profit": pos.take_profit
+            "take_profit": pos.take_profit,
+            "unrealized_pnl": pos.unrealized_pnl
         }
         for pos in positions
     }

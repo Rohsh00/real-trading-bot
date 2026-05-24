@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Alert, Container } from '@mui/material';
@@ -21,7 +21,6 @@ import {
   fetchHealthThunk,
   fetchCandlesThunk,
   runBacktestThunk,
-  deployStrategyThunk,
   fetchSignalsThunk,
   fetchOrdersThunk,
   fetchBrokerStatusThunk,
@@ -48,11 +47,6 @@ function AppContent() {
     loading,
     errorMsg,
   } = useAppSelector((state) => state.trading);
-
-  // Form State
-  const [stratName, setStratName] = useState('');
-  const [stratDesc, setStratDesc] = useState('');
-  const [stratConfig, setStratConfig] = useState('{\n  "ema_short": 12,\n  "ema_long": 26\n}');
 
   // Sync active tab data on change
   useEffect(() => {
@@ -92,26 +86,6 @@ function AppContent() {
 
   // Dynamic theme builder based on mode
   const theme = useMemo(() => getTheme(themeMode), [themeMode]);
-
-  // Create Strategy
-  const handleCreateStrategy = async (e: FormEvent) => {
-    e.preventDefault();
-    try {
-      const parsedConfig = JSON.parse(stratConfig);
-      await dispatch(
-        deployStrategyThunk({
-          name: stratName,
-          description: stratDesc,
-          config: parsedConfig,
-        })
-      ).unwrap();
-
-      setStratName('');
-      setStratDesc('');
-    } catch {
-      // Errors are set to Redux errorMsg automatically by the extraReducer
-    }
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -189,16 +163,7 @@ function AppContent() {
             )}
 
             {activeTab === 'strategies' && (
-              <StrategyHub 
-                strategies={strategies}
-                stratName={stratName}
-                setStratName={setStratName}
-                stratDesc={stratDesc}
-                setStratDesc={setStratDesc}
-                stratConfig={stratConfig}
-                setStratConfig={setStratConfig}
-                onSubmit={handleCreateStrategy}
-              />
+              <StrategyHub strategies={strategies} />
             )}
 
             {activeTab === 'candles' && (

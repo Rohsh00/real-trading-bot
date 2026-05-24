@@ -7,6 +7,7 @@ export interface Position {
   average_price: number;
   stop_loss: number;
   take_profit: number;
+  unrealized_pnl: number;
 }
 
 export interface Strategy {
@@ -244,6 +245,48 @@ export const deployStrategyThunk = createAsyncThunk(
   }
 );
 
+export const updateStrategyThunk = createAsyncThunk(
+  'trading/updateStrategy',
+  async (payload: { id: string; data: Partial<Strategy> }, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/strategies/${payload.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload.data),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || 'Failed to update strategy');
+      }
+      dispatch(fetchStrategiesThunk());
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Strategy update failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const deleteStrategyThunk = createAsyncThunk(
+  'trading/deleteStrategy',
+  async (id: string, { dispatch, rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/strategies/${id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || 'Failed to delete strategy');
+      }
+      dispatch(fetchStrategiesThunk());
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Strategy deletion failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const tradingSlice = createSlice({
   name: 'trading',
   initialState,
@@ -296,6 +339,14 @@ const tradingSlice = createSlice({
         state.errorMsg = null;
       })
       .addCase(deployStrategyThunk.rejected, (state, action) => {
+        state.errorMsg = action.payload as string;
+      })
+      // Update Strategy
+      .addCase(updateStrategyThunk.rejected, (state, action) => {
+        state.errorMsg = action.payload as string;
+      })
+      // Delete Strategy
+      .addCase(deleteStrategyThunk.rejected, (state, action) => {
         state.errorMsg = action.payload as string;
       })
       // Signals

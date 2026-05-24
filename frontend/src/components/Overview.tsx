@@ -26,6 +26,7 @@ interface Position {
   average_price: number;
   stop_loss: number;
   take_profit: number;
+  unrealized_pnl: number;
 }
 
 interface OverviewProps {
@@ -163,6 +164,7 @@ export default function Overview({
                       <TableCell>Average Price</TableCell>
                       <TableCell>Stop Loss</TableCell>
                       <TableCell>Take Profit</TableCell>
+                      <TableCell>Unrealized PnL</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -173,6 +175,9 @@ export default function Overview({
                         <TableCell>${pos.average_price.toLocaleString()}</TableCell>
                         <TableCell sx={{ color: 'error.main' }}>${pos.stop_loss.toLocaleString()}</TableCell>
                         <TableCell sx={{ color: 'success.main' }}>${pos.take_profit.toLocaleString()}</TableCell>
+                        <TableCell sx={{ color: pos.unrealized_pnl >= 0 ? 'success.main' : 'error.main', fontWeight: 500 }}>
+                          {pos.unrealized_pnl >= 0 ? '+' : ''}${pos.unrealized_pnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

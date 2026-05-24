@@ -24,3 +24,24 @@ class StrategyService:
     ):
 
         return await StrategyRepository.get_all(db)
+
+    @staticmethod
+    async def update_strategy(
+        db: AsyncSession,
+        strategy_id: str,
+        update_data: dict
+    ):
+        strategy = await StrategyRepository.get_by_id(db, strategy_id)
+        if not strategy:
+            return None
+        return await StrategyRepository.update(db, strategy, update_data)
+
+    @staticmethod
+    async def delete_strategy(
+        db: AsyncSession,
+        strategy_id: str
+    ):
+        strategy = await StrategyRepository.get_by_id(db, strategy_id)
+        if not strategy:
+            return False
+        return await StrategyRepository.delete(db, strategy)
