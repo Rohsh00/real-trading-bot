@@ -1,6 +1,30 @@
+```text
 # Trading Bot Project Status
 
 Last Updated: 2026-05-24
+
+---
+
+# Product Vision
+
+Production-grade multi-user algorithmic trading platform.
+
+Target Features:
+
+- Multi-user accounts
+- Real broker integrations
+- Portfolio persistence
+- Risk management
+- Audit trail
+- Strategy marketplace
+- SaaS architecture
+- Production monitoring
+- Automated deployment
+
+Design Goal:
+
+Build as a commercial trading platform,
+not as a personal trading bot.
 
 ---
 
@@ -13,6 +37,10 @@ Phase 9.6 (Position Persistence)
 Status:
 
 🚧 In Progress
+
+Next Phase:
+
+Phase 10A (Production Core Foundation)
 
 ---
 
@@ -42,7 +70,11 @@ Status:
 
 🚧 Phase 9.6 In Progress
 
-⏳ Phase 10 Pending
+⏳ Phase 10A Pending
+
+⏳ Phase 10B Pending
+
+⏳ Phase 11 Pending
 
 ---
 
@@ -250,11 +282,11 @@ Positions:
 
 Database Verification:
 
-orders    : 3181
+orders    : 3181+
 
-trades    : 3180
+trades    : 3180+
 
-candles   : 100
+candles   : 100+
 
 positions : 0
 
@@ -321,6 +353,31 @@ Exit Criteria:
 
 ---
 
+# Current Sprint
+
+Phase 9.6 Position Persistence
+
+Tasks:
+
+1. Persist BUY positions
+
+2. Remove positions on SELL
+
+3. Load positions from DB on startup
+
+4. Make Portfolio API DB-backed
+
+5. Verify restart recovery
+
+Exit Criteria:
+
+- Open position survives restart
+- Portfolio API loads from database
+- Positions table populated
+- No in-memory-only positions
+
+---
+
 # Verification
 
 Database:
@@ -376,58 +433,85 @@ This prevents:
 
 ---
 
-# Next Phase
+# Next Phases
 
-## Phase 10
+## Phase 10A
 
-Fyers Integration Foundation
-
-Status:
-
-⏳ Blocked
-
-Blocked By:
-
-Phase 9.6 Position Persistence
+Production Core Foundation
 
 Tasks:
 
-- Fyers Authentication
-- OAuth Flow
-- Access Token Storage
-- Refresh Token Management
-- Fyers REST Client
-- Fyers WebSocket Client
-- Broker Factory Integration
-
----
-
-# Future Roadmap
-
-## Phase 11
-
-NSE + MCX Trading
-
-- NSE Equities
-- NSE Futures
-- NSE Options
-- MCX Commodities
-- Live Orders
+- Audit Trail
+- Risk Controls
+- Service Recovery
+- Enhanced Health Checks
+- Idempotency Protection
 
 Status:
 
 ⏳ Pending
 
+Blocked By:
+
+Phase 9.6
+
+---
+
+## Phase 10B
+
+Broker Framework
+
+Tasks:
+
+- Broker Interface
+- Multi-Broker Support
+- Broker Factory Refactor
+
+Status:
+
+⏳ Pending
+
+Blocked By:
+
+Phase 10A
+
+---
+
+## Phase 11
+
+Fyers Integration
+
+Tasks:
+
+- Authentication
+- OAuth
+- Token Storage
+- Refresh Token Management
+- REST Client
+- WebSocket Client
+
+Status:
+
+⏳ Pending
+
+Blocked By:
+
+Phase 10B
+
 ---
 
 ## Phase 12
 
-Portfolio Engine
+User & Account System
 
-- Portfolio Allocation
-- Exposure Management
-- Correlation Checks
-- Capital Allocation
+Tasks:
+
+- Users Table
+- Accounts Table
+- Broker Accounts
+- Authentication
+- Authorization
+- Multi-Tenant Architecture
 
 Status:
 
@@ -437,12 +521,15 @@ Status:
 
 ## Phase 13
 
-Optimization Engine
+Portfolio Engine
 
-- EMA Optimization
-- RSI Optimization
-- Parameter Sweeps
-- Walk Forward Testing
+Tasks:
+
+- Portfolio Allocation
+- Exposure Management
+- Capital Allocation
+- Margin Tracking
+- Multi-User Portfolio Management
 
 Status:
 
@@ -452,12 +539,16 @@ Status:
 
 ## Phase 14
 
-Quant Research
+Observability
 
-- Monte Carlo Simulation
-- VaR
-- Stress Testing
-- Regime Detection
+Tasks:
+
+- Prometheus
+- Grafana
+- Loki
+- Metrics
+- Alerts
+- Monitoring Dashboards
 
 Status:
 
@@ -469,11 +560,14 @@ Status:
 
 Dashboard
 
+Tasks:
+
 - React Frontend
 - Live Charts
 - Portfolio Screen
 - Orders Screen
 - Trade Journal
+- User Management
 
 Status:
 
@@ -485,9 +579,13 @@ Status:
 
 AI Layer
 
+Tasks:
+
 - Feature Engineering
 - Prediction Models
 - Signal Ranking
+- Regime Detection
+- Risk Forecasting
 
 Status:
 
@@ -499,11 +597,15 @@ Status:
 
 Production Deployment
 
+Tasks:
+
 - Nginx
 - CI/CD
 - Monitoring
 - Alerting
 - VPS Deployment
+- Backups
+- Disaster Recovery
 
 Status:
 
@@ -533,13 +635,15 @@ Current Alembic Revision:
 
 579ce828767e
 
-Resume From:
+Current Focus:
 
-Phase 9.6
+Phase 9.6 Position Persistence
 
-Position Persistence
+Do NOT start Phase 10A until Position Persistence is complete.
 
-Do NOT start Phase 10 until Position Persistence is complete.
+Do NOT start Broker Integration until Phase 10A is complete.
+
+Do NOT start Multi-User Architecture until Broker Framework is complete.
 
 Next Immediate Tasks:
 
@@ -552,3 +656,8 @@ Next Immediate Tasks:
 4. Make Portfolio API DB-backed
 
 5. Verify restart recovery
+
+Project Goal:
+
+Build a production-grade multi-user algorithmic trading platform suitable for real-money trading and commercial SaaS deployment.
+```
