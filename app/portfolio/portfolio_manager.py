@@ -12,6 +12,28 @@ class PortfolioManager:
     realized_pnl = 0.0
 
     @classmethod
+    async def load_positions(
+        cls,
+        positions_list: list
+    ):
+
+        cls.positions.clear()
+
+        for pos in positions_list:
+
+            cls.positions[pos.symbol] = {
+                "quantity": pos.quantity,
+                "average_price": pos.average_price,
+                "stop_loss": pos.stop_loss,
+                "take_profit": pos.take_profit
+            }
+
+        logger.info(
+            f"Loaded {len(positions_list)} positions "
+            f"into memory."
+        )
+
+    @classmethod
     async def update_position(
         cls,
         symbol: str,
