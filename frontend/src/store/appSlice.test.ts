@@ -5,10 +5,11 @@ import appReducer, {
   setTenant,
   AppState,
 } from './appSlice';
+import { TabEnum } from '../types/enums';
 
 const initialState: AppState = {
   themeMode: 'dark',
-  activeTab: 'overview',
+  activeTab: TabEnum.OVERVIEW,
   tenant: 'trader-standard',
 };
 
@@ -34,8 +35,8 @@ describe('appSlice', () => {
   });
 
   it('setActiveTab changes active tab', () => {
-    const state = appReducer(initialState, setActiveTab('positions'));
-    expect(state.activeTab).toBe('positions');
+    const state = appReducer(initialState, setActiveTab(TabEnum.POSITIONS));
+    expect(state.activeTab).toBe(TabEnum.POSITIONS);
   });
 
   it('setTenant changes tenant string', () => {

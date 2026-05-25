@@ -1,8 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import App from './App';
-import * as reactRedux from 'react-redux';
-import { store } from './store';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
