@@ -38,6 +38,7 @@ class CandleRepository:
                 Candle.symbol == symbol,
                 Candle.timeframe == timeframe
             )
+            .order_by(Candle.timestamp.desc())
             .limit(limit)
         )
 

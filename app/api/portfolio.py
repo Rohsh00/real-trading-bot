@@ -1,5 +1,10 @@
 from fastapi import APIRouter
+from fastapi import Depends
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
+from app.services.position.position_service import PositionService
 from app.portfolio.portfolio_manager import (
     PortfolioManager
 )
@@ -8,16 +13,29 @@ router = APIRouter()
 
 
 @router.get("/portfolio")
+async def get_portfolio(
+    db: AsyncSession = Depends(get_db)
+):
 
-async def get_portfolio():
+    position_service = PositionService(db)
+    positions = await position_service.get_all_positions()
+
+    positions_dict = {
+        pos.symbol: {
+            "quantity": pos.quantity,
+            "average_price": pos.average_price,
+            "stop_loss": pos.stop_loss,
+            "take_profit": pos.take_profit,
+            "unrealized_pnl": pos.unrealized_pnl
+        }
+        for pos in positions
+    }
+
+    cash_balance = await PortfolioManager.get_cash_balance()
+    realized_pnl = await PortfolioManager.get_realized_pnl()
 
     return {
-        "cash_balance":
-            PortfolioManager.cash_balance,
-
-        "positions":
-            PortfolioManager.positions,
-
-        "realized_pnl":
-            PortfolioManager.realized_pnl
+        "cash_balance": cash_balance,
+        "positions": positions_dict,
+        "realized_pnl": realized_pnl
     }

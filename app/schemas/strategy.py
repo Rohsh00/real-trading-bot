@@ -20,3 +20,11 @@ class StrategyResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class StrategyUpdate(BaseModel):
+
+    is_active: Optional[bool] = None
+    config: Optional[dict] = None
+    name: Optional[str] = None
+    description: Optional[str] = None

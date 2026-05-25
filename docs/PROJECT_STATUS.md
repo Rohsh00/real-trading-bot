@@ -32,7 +32,7 @@ not as a personal trading bot.
 
 Current Phase:
 
-Phase 9.6 (Position Persistence)
+Phase 10A (Production Core Foundation)
 
 Status:
 
@@ -40,7 +40,7 @@ Status:
 
 Next Phase:
 
-Phase 10A (Production Core Foundation)
+Phase 10B (Broker Framework)
 
 ---
 
@@ -68,9 +68,9 @@ Phase 10A (Production Core Foundation)
 
 ✅ Phase 9.5 Complete
 
-🚧 Phase 9.6 In Progress
+✅ Phase 9.6 Complete
 
-⏳ Phase 10A Pending
+🚧 Phase 10A In Progress
 
 ⏳ Phase 10B Pending
 
@@ -162,25 +162,16 @@ Verification:
 
 # Active Services
 
-Terminal 1
+Unified Startup Script:
+`./start_backend.sh`
 
-python -m app.tasks.stream_runner
-
-Terminal 2
-
-python -m app.tasks.strategy_runner
-
-Terminal 3
-
-python -m app.tasks.execution_runner
-
-Terminal 4
-
-python -m app.tasks.candle_persistence_runner
-
-Terminal 5
-
-uvicorn app.main:app --reload
+This script manages all required background processes:
+- `app.tasks.stream_runner`
+- `app.tasks.candle_persistence_runner`
+- `app.tasks.strategy_runner`
+- `app.tasks.execution_runner`
+- `app.tasks.position_monitor`
+- `uvicorn app.main:app --reload`
 
 ---
 
@@ -260,11 +251,11 @@ Endpoint:
 
 Status:
 
-🚧 In Progress
+✅ Complete
 
 Problem:
 
-PortfolioManager stores positions only in memory.
+PortfolioManager stored positions only in memory.
 
 Current State:
 
@@ -278,7 +269,7 @@ Candles:
 ✅ Persisted
 
 Positions:
-❌ Not Persisted
+✅ Persisted
 
 Database Verification:
 
@@ -288,7 +279,7 @@ trades    : 3180+
 
 candles   : 100+
 
-positions : 0
+positions : populated (verified via tests)
 
 ---
 
@@ -317,17 +308,15 @@ Completed:
 
 ✅ PositionService created
 
-Pending:
+✅ Persist BUY positions
 
-⏳ Persist BUY positions
+✅ Remove positions on SELL
 
-⏳ Remove positions on SELL
+✅ Load positions from DB on startup
 
-⏳ Load positions from DB on startup
+✅ Make Portfolio API DB-backed
 
-⏳ Make Portfolio API DB-backed
-
-⏳ Position recovery after restart
+✅ Position recovery after restart
 
 Architecture Goal:
 
@@ -355,26 +344,27 @@ Exit Criteria:
 
 # Current Sprint
 
-Phase 9.6 Position Persistence
+Phase 10A Production Core Foundation
 
 Tasks:
 
-1. Persist BUY positions
+1. Audit Trail
 
-2. Remove positions on SELL
+2. Risk Controls
 
-3. Load positions from DB on startup
+3. Service Recovery
 
-4. Make Portfolio API DB-backed
+4. Enhanced Health Checks
 
-5. Verify restart recovery
+5. Idempotency Protection
 
 Exit Criteria:
 
-- Open position survives restart
-- Portfolio API loads from database
-- Positions table populated
-- No in-memory-only positions
+- Audit log records all events
+- Risk limits actively validated
+- Auto-recovery of failed processes
+- Endpoint reports detail on memory/db/redis status
+- Idempotency key checked for execution requests
 
 ---
 
@@ -386,13 +376,15 @@ Database:
 
 ✅ unique candle constraint active
 
-⚠️ positions table empty
+✅ positions table populated
 
 API:
 
 ✅ /api/v1/candles returns live data
 
 ✅ /api/v1/health returns healthy
+
+✅ /api/v1/portfolio returns DB-backed data
 
 Redis:
 
@@ -562,16 +554,25 @@ Dashboard
 
 Tasks:
 
-- React Frontend
-- Live Charts
-- Portfolio Screen
-- Orders Screen
-- Trade Journal
-- User Management
+- React + TypeScript Frontend
+- Live Charts (timeframe candlestick visualization via WebSocket)
+- Portfolio Screen (live database positions)
+- Strategies Hub (form deployment and listings)
+- SaaS Plan & Tenant switcher
+- **Full Backend Data Wiring** (Orders, Signals, Broker Status)
 
 Status:
 
-⏳ Pending
+✅ Complete
+
+Rebuild details:
+- Converted dashboard layout to official Material-UI (MUI) design system.
+- Created custom theme (`theme.ts`) supporting sleek dark mode aesthetics.
+- Refactored frontend into modular, reusable components inside `src/components/`.
+- Resolved all flicker/rendering issues with `lightweight-charts` by porting to WebSocket real-time ticks.
+- Wired all backend systems: Signals feed, Execution log, Broker Mode indicator, and Strategy presets.
+- Ensured strict typing and resolved all TypeScript compilation issues (`npm run build` succeeds).
+- Cleaned up lint warnings/errors to achieve clean ESLint execution (`npm run lint` with zero warnings).
 
 ---
 
@@ -631,15 +632,15 @@ System Status:
 
 ✅ Uniqueness Protection Active
 
+✅ Position Persistence Verified
+
 Current Alembic Revision:
 
 579ce828767e
 
 Current Focus:
 
-Phase 9.6 Position Persistence
-
-Do NOT start Phase 10A until Position Persistence is complete.
+Phase 10A Production Core Foundation
 
 Do NOT start Broker Integration until Phase 10A is complete.
 
@@ -647,15 +648,15 @@ Do NOT start Multi-User Architecture until Broker Framework is complete.
 
 Next Immediate Tasks:
 
-1. Persist BUY positions
+1. Design & Implement Audit Trail
 
-2. Remove positions on SELL
+2. Add Risk Controls
 
-3. Load positions from DB on startup
+3. Implement Service Recovery
 
-4. Make Portfolio API DB-backed
+4. Add Enhanced Health Checks
 
-5. Verify restart recovery
+5. Add Idempotency Protection
 
 Project Goal:
 

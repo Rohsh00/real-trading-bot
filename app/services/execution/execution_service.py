@@ -12,6 +12,14 @@ from app.repositories.trade_repository import (
     TradeRepository
 )
 
+from app.services.position.position_service import (
+    PositionService
+)
+
+from app.portfolio.portfolio_manager import (
+    PortfolioManager
+)
+
 
 class ExecutionService:
 
@@ -23,6 +31,8 @@ class ExecutionService:
         self.order_repo = OrderRepository(db)
 
         self.trade_repo = TradeRepository(db)
+
+        self.position_service = PositionService(db)
 
     async def persist_execution(
         self,
@@ -63,5 +73,23 @@ class ExecutionService:
         await self.trade_repo.create(
             trade
         )
+
+        side = execution_result["side"]
+        symbol = execution_result["symbol"]
+        price = float(execution_result["price"])
+        quantity = float(execution_result["quantity"])
+
+        if side == "BUY":
+            await self.position_service.create_position(
+                symbol=symbol,
+                quantity=quantity,
+                average_price=price,
+                stop_loss=price * 0.98,
+                take_profit=price * 1.03
+            )
+        elif side == "SELL":
+            await self.position_service.close_position(
+                symbol=symbol
+            )
 
         return saved_order

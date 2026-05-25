@@ -1,0 +1,41 @@
+{
+  "brand": {
+    "name": "Antigravity SaaS"
+  },
+  "sidebar": {
+    "tenant": "TENANT ACCOUNT",
+    "tiers": {
+      "standard": "Standard Tier (User #104)",
+      "pro": "Pro Tier (User #022)",
+      "institutional": "Institutional (User #001)"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "positions": "Open Positions",
+      "strategies": "Strategy Hub",
+      "candles": "Live Charts",
+      "backtest": "Backtesting",
+      "billing": "SaaS Billing"
+    }
+  },
+  "header": {
+    "title": {
+      "overview": "SaaS Dashboard",
+      "positions": "Open Positions",
+      "strategies": "Strategy Hub",
+      "candles": "Live Candles",
+      "backtest": "Backtesting Lab",
+      "billing": "Premium SaaS Plans",
+      "default": "SaaS Dashboard"
+    },
+    "subtitle": {
+      "overview": "Real-time multi-user trading platform metrics.",
+      "positions": "Inspect active, database-persisted trades.",
+      "strategies": "Manage and deploy algorithmic trading strategies.",
+      "candles": "View websocket stream timeframe candles.",
+      "backtest": "Evaluate strategy historical performance.",
+      "billing": "Billing subscription portals and user levels.",
+      "default": "Real-time multi-user trading platform metrics."
+    }
+  }
+}

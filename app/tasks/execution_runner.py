@@ -18,10 +18,28 @@ from app.services.execution.execution_service import (
     ExecutionService
 )
 
+from app.services.position.position_service import (
+    PositionService
+)
+
+from app.portfolio.portfolio_manager import (
+    PortfolioManager
+)
+
 from app.core.logger import logger
 
 
 async def main():
+
+    # Load positions from database on startup
+    async with AsyncSessionLocal() as db:
+        position_service = PositionService(db)
+        positions = await position_service.get_all_positions()
+        await PortfolioManager.load_positions(positions)
+        logger.info(
+            f"Execution Runner loaded {len(positions)} positions "
+            f"from database."
+        )
 
     pubsub = redis_client.pubsub()
 

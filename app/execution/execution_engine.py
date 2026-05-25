@@ -20,7 +20,9 @@ class ExecutionEngine:
     DEFAULT_QUANTITY = 0.01
 
     def __init__(self):
-
+        import asyncio
+        self.locks = {}
+        
         with open(
             "config/broker_config.yaml",
             "r"
@@ -40,10 +42,14 @@ class ExecutionEngine:
         self,
         signal: dict
     ):
-
+        import asyncio
         symbol = signal["symbol"]
 
-        side = signal["signal"]
+        if symbol not in self.locks:
+            self.locks[symbol] = asyncio.Lock()
+
+        async with self.locks[symbol]:
+            side = signal["signal"]
 
         price = signal["price"]
 
