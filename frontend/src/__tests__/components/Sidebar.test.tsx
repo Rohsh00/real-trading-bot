@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Sidebar from './Sidebar';
+import Sidebar from '../../components/Sidebar';
 import { vi } from 'vitest';
-import { TabEnum } from '../types/enums';
+import { TabEnum } from '../../types/enums';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({

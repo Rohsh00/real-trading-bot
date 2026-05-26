@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Overview from './Overview';
+import Overview from '../../components/Overview';
 import { Provider } from 'react-redux';
-import { store } from '../store';
+import { store } from '../../store';
 
 describe('Overview Component', () => {
   const mockPositions = {

@@ -1,4 +1,4 @@
-import tradingReducer, { clearErrorMsg, setErrorMsg, TradingState } from './tradingSlice';
+import tradingReducer, { clearErrorMsg, setErrorMsg, TradingState } from '../../store/tradingSlice';
 
 const initialState: TradingState = {
   cashBalance: 100000.0,

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { getHeaderTitle, getHeaderSubtitle } from './helpers';
-import { TabEnum } from '../types/enums';
+import { getHeaderTitle, getHeaderSubtitle } from '../../utils/helpers';
+import { TabEnum } from '../../types/enums';
 
 describe('Header Helpers', () => {
   it('should return correct title for OVERVIEW tab', () => {

@@ -4,8 +4,8 @@ import appReducer, {
   setActiveTab,
   setTenant,
   AppState,
-} from './appSlice';
-import { TabEnum } from '../types/enums';
+} from '../../store/appSlice';
+import { TabEnum } from '../../types/enums';
 
 const initialState: AppState = {
   themeMode: 'dark',
