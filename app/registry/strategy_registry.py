@@ -1,16 +1,9 @@
 import yaml
+import importlib
+import pkgutil
 
-from app.strategy_engine.ema_crossover import (
-    EMACrossoverStrategy
-)
-
-from app.strategies.rsi_strategy import (
-    RSIStrategy
-)
-
-from app.strategies.macd_strategy import (
-    MACDStrategy
-)
+import app.strategies
+import app.strategy_engine
 
 
 class StrategyRegistry:
@@ -24,26 +17,13 @@ class StrategyRegistry:
 
             self.config = yaml.safe_load(file)
 
-        self.strategy_map = {
-            "ema": EMACrossoverStrategy(),
-            "rsi": RSIStrategy(),
-            "macd": MACDStrategy()
-        }
+        self._load_strategies()
 
-    def get_strategies_for_symbol(
-        self,
-        symbol
-    ):
-
-        strategy_names = (
-            self.config["strategies"]
-            .get(symbol, [])
-        )
-
-        return [
-            self.strategy_map[name]
-            for name in strategy_names
-        ]
+    def _load_strategies(self):
+        packages = [app.strategies, app.strategy_engine]
+        for package in packages:
+            for _, module_name, _ in pkgutil.iter_modules(package.__path__):
+                importlib.import_module(f"{package.__name__}.{module_name}")
 
     def get_symbols(self):
 

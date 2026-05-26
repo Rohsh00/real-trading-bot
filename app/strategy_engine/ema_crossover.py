@@ -15,6 +15,8 @@ from app.core.logger import logger
 
 class EMACrossoverStrategy(BaseStrategy):
 
+    strategy_name = "ema_crossover"
+
     def __init__(
         self,
         fast_period: int = 5,

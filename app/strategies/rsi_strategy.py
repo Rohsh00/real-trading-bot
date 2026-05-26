@@ -8,8 +8,11 @@ from app.signals.signal_publisher import (
 
 from app.core.logger import logger
 
+from app.strategy_engine.base_strategy import BaseStrategy
 
-class RSIStrategy:
+class RSIStrategy(BaseStrategy):
+
+    strategy_name = "rsi"
 
     def __init__(
         self,

@@ -2,14 +2,14 @@ from app.core.database import AsyncSessionLocal
 from app.repositories.strategy_repository import StrategyRepository
 from app.core.logger import logger
 
-from app.strategy_engine.ema_crossover import EMACrossoverStrategy
-from app.strategies.rsi_strategy import RSIStrategy
-from app.strategies.macd_strategy import MACDStrategy
+from app.strategy_engine.base_strategy import BaseStrategy
+from app.registry.strategy_registry import StrategyRegistry
 
 class StrategyManager:
 
     def __init__(self):
         self.active_strategies = {}
+        StrategyRegistry()  # Ensure strategies are dynamically loaded
 
     async def sync_strategies(self):
         async with AsyncSessionLocal() as db:
@@ -30,21 +30,25 @@ class StrategyManager:
                 logger.info(f"Loading active strategy {strat_id} ({db_strat.name}) into execution engine")
                 config = db_strat.config or {}
                 
-                # Infer strategy type
-                if "fast_period" in config or "slow_period" in config or "ema" in db_strat.name.lower():
-                    self.active_strategies[strat_id] = EMACrossoverStrategy(
-                        fast_period=config.get("fast_period", 5),
-                        slow_period=config.get("slow_period", 10)
-                    )
-                elif "period" in config or "overbought" in config or "rsi" in db_strat.name.lower():
-                    self.active_strategies[strat_id] = RSIStrategy(
-                        period=config.get("period", 14)
-                    )
-                elif "fast" in config or "slow" in config or "macd" in db_strat.name.lower():
-                    self.active_strategies[strat_id] = MACDStrategy()
-                else:
-                    logger.warning(f"Could not infer strategy type for {db_strat.name}, defaulting to EMA")
-                    self.active_strategies[strat_id] = EMACrossoverStrategy()
+                # Infer strategy type dynamically or fallback to inference
+                strategy_type = config.get("type") or config.get("strategy_type")
+                if not strategy_type:
+                    if "ema" in db_strat.name.lower():
+                        strategy_type = "ema_crossover"
+                    elif "rsi" in db_strat.name.lower():
+                        strategy_type = "rsi"
+                    elif "macd" in db_strat.name.lower():
+                        strategy_type = "macd"
+                    else:
+                        logger.warning(f"Could not infer strategy type for {db_strat.name}, defaulting to ema_crossover")
+                        strategy_type = "ema_crossover"
+                
+                kwargs = {k: v for k, v in config.items() if k not in ("type", "strategy_type")}
+                try:
+                    self.active_strategies[strat_id] = BaseStrategy.create(strategy_type, **kwargs)
+                except Exception as e:
+                    logger.error(f"Failed to create strategy {strategy_type} for {db_strat.name}: {e}")
+
 
     async def process_market_data(
         self,

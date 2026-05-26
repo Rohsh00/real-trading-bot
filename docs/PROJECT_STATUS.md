@@ -342,6 +342,25 @@ Exit Criteria:
 
 ---
 
+# Strategy Engine Upgrade
+
+Status:
+
+✅ Complete
+
+Problem:
+
+Strategy manager and registry used hardcoded mapping for `EMACrossoverStrategy`, `RSIStrategy`, and `MACDStrategy`. Adding new strategies required modifying core engine files.
+
+Current State:
+
+- `BaseStrategy` implements `__init_subclass__` auto-registration.
+- `StrategyRegistry` dynamically discovers and imports strategy classes using `pkgutil` and `importlib`.
+- `StrategyManager` dynamically instantiates active strategies via `BaseStrategy.create()`.
+- Adding a new strategy only requires creating a file in `app/strategies/` inheriting from `BaseStrategy`.
+
+---
+
 # Current Sprint
 
 Phase 10A Production Core Foundation
@@ -633,6 +652,8 @@ System Status:
 ✅ Uniqueness Protection Active
 
 ✅ Position Persistence Verified
+
+✅ Dynamic Strategy Discovery Operational
 
 Current Alembic Revision:
 
