@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 from app.portfolio.portfolio_manager import (
     PortfolioManager
@@ -38,6 +39,17 @@ async def main():
         await asyncio.sleep(10)
 
 
+async def run_with_recovery():
+    while True:
+        try:
+            await main()
+        except Exception as e:
+            logger.error(f"Position Monitor crashed: {e}")
+            logger.error(traceback.format_exc())
+            logger.info("Restarting Position Monitor in 5 seconds...")
+            await asyncio.sleep(5)
+
+
 if __name__ == "__main__":
 
-    asyncio.run(main())
+    asyncio.run(run_with_recovery())
