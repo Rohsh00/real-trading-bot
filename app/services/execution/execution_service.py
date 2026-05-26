@@ -20,6 +20,8 @@ from app.portfolio.portfolio_manager import (
     PortfolioManager
 )
 
+from app.services.audit_service import AuditService
+
 
 class ExecutionService:
 
@@ -87,9 +89,31 @@ class ExecutionService:
                 stop_loss=price * 0.98,
                 take_profit=price * 1.03
             )
+            await AuditService.log_event(
+                self.order_repo.db,
+                event_type="POSITION",
+                event_name="POSITION_OPENED",
+                entity_id=symbol,
+                details={"side": side, "quantity": quantity, "price": price}
+            )
         elif side == "SELL":
             await self.position_service.close_position(
                 symbol=symbol
             )
+            await AuditService.log_event(
+                self.order_repo.db,
+                event_type="POSITION",
+                event_name="POSITION_CLOSED",
+                entity_id=symbol,
+                details={"side": side, "quantity": quantity, "price": price}
+            )
+            
+        await AuditService.log_event(
+            self.order_repo.db,
+            event_type="EXECUTION",
+            event_name="ORDER_FILLED",
+            entity_id=saved_order.id,
+            details=execution_result
+        )
 
         return saved_order

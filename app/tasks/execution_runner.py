@@ -31,6 +31,8 @@ from app.core.logger import logger
 
 async def main():
 
+    from app.services.audit_service import AuditService
+
     # Load positions from database on startup
     async with AsyncSessionLocal() as db:
         position_service = PositionService(db)
@@ -39,6 +41,12 @@ async def main():
         logger.info(
             f"Execution Runner loaded {len(positions)} positions "
             f"from database."
+        )
+        await AuditService.log_event(
+            db,
+            event_type="SYSTEM",
+            event_name="SYSTEM_STARTUP",
+            details={"positions_loaded": len(positions), "service": "execution_runner"}
         )
 
     pubsub = redis_client.pubsub()

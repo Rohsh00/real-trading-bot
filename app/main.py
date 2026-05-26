@@ -6,6 +6,7 @@ from app.api.portfolio import router as portfolio_router
 from app.api.signals import router as signals_router
 from app.api.orders import router as orders_router
 from app.api.broker import router as broker_router
+from app.api.audit import router as audit_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -79,6 +80,11 @@ app.include_router(
 
 app.include_router(
     broker_router,
+    prefix="/api/v1"
+)
+
+app.include_router(
+    audit_router,
     prefix="/api/v1"
 )
 

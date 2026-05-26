@@ -5,3 +5,4 @@ from app.models.order import Order
 from app.models.trade import Trade
 from app.models.position import Position
 from app.models.candle import Candle
+from app.models.audit import AuditLog
