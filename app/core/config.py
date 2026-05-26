@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
 
+    BINANCE_WS_BASE_URL: str = "wss://stream.binance.com:443"
+
     LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(

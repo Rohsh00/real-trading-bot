@@ -1,12 +1,17 @@
 import json
 import websocket
 import redis
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from app.core.config import settings
 
 REDIS_CHANNEL = "market_ticks"
 
-r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB, decode_responses=True)
 
-SOCKET = "wss://stream.binance.com:9443/ws/btcusdt@trade"
+SOCKET = f"{settings.BINANCE_WS_BASE_URL}/ws/btcusdt@trade"
 
 
 def on_message(ws, message):

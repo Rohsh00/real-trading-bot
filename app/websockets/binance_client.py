@@ -8,6 +8,7 @@ from app.registry.strategy_registry import (
 )
 
 from app.core.logger import logger
+from app.core.config import settings
 
 
 class BinanceWebSocketClient:
@@ -19,7 +20,7 @@ class BinanceWebSocketClient:
     )
 
     stream_url = (
-        "wss://stream.binance.com:9443/stream?streams="
+        f"{settings.BINANCE_WS_BASE_URL}/stream?streams="
         + "/".join(
             [
                 f"{symbol.lower()}@trade"
