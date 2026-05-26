@@ -9,6 +9,8 @@ from app.core.logger import logger
 
 class PaperBroker(BaseBroker):
 
+    broker_name = "paper"
+
     async def place_order(
         self,
         symbol,

@@ -1,17 +1,25 @@
-from app.brokers.paper_broker import (
-    PaperBroker
-)
-
+import importlib
+import pkgutil
+import app.brokers
+from app.brokers.interfaces.base_broker import BaseBroker
 
 class BrokerFactory:
 
-    @staticmethod
-    def get_broker(
-        broker_name="paper"
-    ):
+    _loaded = False
 
-        brokers = {
-            "paper": PaperBroker()
-        }
+    @classmethod
+    def _load_brokers(cls):
+        if cls._loaded:
+            return
+            
+        package = app.brokers
+        for _, module_name, is_pkg in pkgutil.iter_modules(package.__path__):
+            if not is_pkg:
+                importlib.import_module(f"{package.__name__}.{module_name}")
+                
+        cls._loaded = True
 
-        return brokers[broker_name]
+    @classmethod
+    def get_broker(cls, broker_name="paper", **kwargs):
+        cls._load_brokers()
+        return BaseBroker.create(broker_name, **kwargs)
