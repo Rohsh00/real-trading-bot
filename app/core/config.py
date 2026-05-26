@@ -18,6 +18,10 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
+    FYERS_APP_ID: str = ""
+    FYERS_SECRET_KEY: str = ""
+    FYERS_REDIRECT_URI: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
