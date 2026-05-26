@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box, Alert, Container } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 
 import { useAppDispatch, useAppSelector } from '../store';
 import { getTheme } from '../theme';
@@ -24,6 +25,7 @@ import { useTradingData } from '../hooks/useTradingData';
 const AppLayout: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   // App Settings from Redux
   const themeMode = useAppSelector((state) => state.app.themeMode);
@@ -62,9 +64,15 @@ const AppLayout: React.FC = React.memo(() => {
     dispatch(fetchPortfolioThunk());
   }, [dispatch]);
 
-  const handleExecuteBacktest = useCallback(() => {
-    dispatch(runBacktestThunk());
-  }, [dispatch]);
+  const handleExecuteBacktest = useCallback(async () => {
+    try {
+      await dispatch(runBacktestThunk()).unwrap();
+      enqueueSnackbar('Backtest executed successfully', { variant: 'success' });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Backtest failed');
+      enqueueSnackbar(message, { variant: 'error' });
+    }
+  }, [dispatch, enqueueSnackbar]);
 
   const handleToggleTheme = useCallback(() => {
     dispatch(toggleThemeMode());

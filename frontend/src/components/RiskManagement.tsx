@@ -17,9 +17,11 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { useAppDispatch, useAppSelector } from '../store';
 import { fetchRiskSettingsThunk, updateRiskSettingsThunk, RiskSettings } from '../store/tradingSlice';
+import { useSnackbar } from 'notistack';
 
 const RiskManagement: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const { riskSettings, loading } = useAppSelector((state) => state.trading);
 
   const [formData, setFormData] = useState<RiskSettings>({
@@ -68,8 +70,14 @@ const RiskManagement: React.FC = React.memo(() => {
     }));
   };
 
-  const handleSave = () => {
-    dispatch(updateRiskSettingsThunk(formData));
+  const handleSave = async () => {
+    try {
+      await dispatch(updateRiskSettingsThunk(formData)).unwrap();
+      enqueueSnackbar('Risk settings saved successfully', { variant: 'success' });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Failed to save risk settings');
+      enqueueSnackbar(message, { variant: 'error' });
+    }
   };
 
   const handleRefresh = () => {

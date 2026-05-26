@@ -2,8 +2,8 @@ import { FormEvent, useState, useMemo } from 'react';
 import { 
   Grid, Card, Typography, Box, TextField, Button, Table, TableHead, 
   TableRow, TableCell, TableBody, Chip, IconButton, Tooltip, Dialog, 
-  DialogTitle, DialogContent, DialogContentText, DialogActions, Snackbar, 
-  Alert, Checkbox, Toolbar, alpha, useTheme
+  DialogTitle, DialogContent, DialogContentText, DialogActions, 
+  Checkbox, Toolbar, alpha, useTheme
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PlusIcon from '@mui/icons-material/Add';
@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useSnackbar } from 'notistack';
 
 import { useAppDispatch } from '../store';
 import { 
@@ -59,12 +60,10 @@ export default function StrategyHub({ strategies }: StrategyHubProps) {
   const [selectedStrategy, setSelectedStrategy] = useState<Strategy | null>(null);
 
   // Snackbar State
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMsg, setSnackbarMsg] = useState('');
+  const { enqueueSnackbar } = useSnackbar();
 
   const showToast = (msg: string) => {
-    setSnackbarMsg(msg);
-    setSnackbarOpen(true);
+    enqueueSnackbar(msg, { variant: 'success' });
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,8 +121,10 @@ export default function StrategyHub({ strategies }: StrategyHubProps) {
         showToast(`Successfully deleted ${selectedIds.length} strategies.`);
         setSelectedIds([]);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Action failed:", err);
+      const message = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Action failed');
+      enqueueSnackbar(message, { variant: 'error' });
     }
     handleCloseDialog();
   };
@@ -142,8 +143,9 @@ export default function StrategyHub({ strategies }: StrategyHubProps) {
       setStratName('');
       setStratDesc('');
       showToast('Quantitative Model deployed successfully.');
-    } catch {
-      // Handled by Redux globally
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Deployment failed');
+      enqueueSnackbar(message, { variant: 'error' });
     }
   };
 
@@ -449,18 +451,6 @@ export default function StrategyHub({ strategies }: StrategyHubProps) {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Success Toast */}
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={4000} 
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-          {snackbarMsg}
-        </Alert>
-      </Snackbar>
     </>
   );
 }
