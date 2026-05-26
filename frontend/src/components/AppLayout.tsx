@@ -13,6 +13,7 @@ import StrategyHub from './StrategyHub';
 import Candles from './Candles';
 import Backtesting from './Backtesting';
 import Billing from './Billing';
+import RiskManagement from './RiskManagement';
 
 import { toggleThemeMode, setActiveTab, setTenant } from '../store/appSlice';
 import { clearErrorMsg, fetchPortfolioThunk, runBacktestThunk } from '../store/tradingSlice';
@@ -106,6 +107,8 @@ const AppLayout: React.FC = React.memo(() => {
         );
       case TabEnum.BILLING:
         return <Billing tenant={tenant} />;
+      case TabEnum.RISK:
+        return <RiskManagement />;
       default:
         return null;
     }

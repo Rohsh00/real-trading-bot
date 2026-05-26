@@ -10,6 +10,7 @@ const initialState: TradingState = {
   signals: [],
   orders: [],
   brokerStatus: null,
+  riskSettings: null,
   isHealthOk: true,
   loading: false,
   errorMsg: null,

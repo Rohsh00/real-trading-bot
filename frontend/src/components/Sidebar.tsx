@@ -18,6 +18,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import PlayIcon from '@mui/icons-material/PlayArrow';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import UsersIcon from '@mui/icons-material/People';
+import SecurityIcon from '@mui/icons-material/Security';
 import { useTranslation } from 'react-i18next';
 import { TabEnum } from '../types/enums';
 
@@ -146,6 +147,17 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({ activeTab, setActiveTab, t
             <CreditCardIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary={t('sidebar.tabs.billing')} />
+        </ListItemButton>
+
+        <ListItemButton
+          selected={activeTab === TabEnum.RISK}
+          onClick={() => setActiveTab(TabEnum.RISK)}
+          sx={{ borderRadius: 2 }}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: activeTab === TabEnum.RISK ? 'primary.main' : 'text.secondary' }}>
+            <SecurityIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t('sidebar.tabs.risk', 'Risk Controls')} />
         </ListItemButton>
       </List>
 

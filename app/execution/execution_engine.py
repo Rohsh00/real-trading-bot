@@ -79,7 +79,8 @@ class ExecutionEngine:
             await RiskManager.validate_order(
                 symbol=symbol,
                 quantity=quantity,
-                price=price
+                price=price,
+                side=side
             )
         )
 

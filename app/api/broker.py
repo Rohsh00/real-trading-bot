@@ -17,12 +17,15 @@ async def get_broker_status():
     except Exception:
         broker_name = "unknown"
 
+    from app.services.risk_service import RiskService
+    settings = await RiskService.get_settings()
+
     return {
         "broker": broker_name,
         "mode": "Paper Trading" if broker_name == "paper" else "Live Trading",
         "is_paper": broker_name == "paper",
         "risk_manager": {
-            "max_position_size": RiskManager.MAX_POSITION_SIZE,
+            "max_position_size": settings.get("max_position_size", 10000.0),
             "currency": "USD",
         },
     }
