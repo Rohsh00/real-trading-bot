@@ -1,4 +1,8 @@
 import yaml
+import json
+import hashlib
+
+from app.cache.redis import redis_client
 
 from app.portfolio.portfolio_manager import (
     PortfolioManager
@@ -44,6 +48,19 @@ class ExecutionEngine:
     ):
         import asyncio
         symbol = signal["symbol"]
+
+        # Idempotency Protection
+        if "idempotency_key" in signal:
+            idempotency_key = f"execution:idempotency:{signal['idempotency_key']}"
+        else:
+            signal_str = json.dumps(signal, sort_keys=True)
+            signal_hash = hashlib.sha256(signal_str.encode()).hexdigest()
+            idempotency_key = f"execution:idempotency:{signal_hash}"
+
+        acquired = await redis_client.set(idempotency_key, "1", nx=True, ex=10)
+        if not acquired:
+            logger.warning(f"Duplicate execution blocked by idempotency key: {idempotency_key}")
+            return
 
         if symbol not in self.locks:
             self.locks[symbol] = asyncio.Lock()
