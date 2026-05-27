@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import Overview from '../../components/Overview';
+import Overview from '../../components/features/Overview';
 import { Provider } from 'react-redux';
 import { store } from '../../store';
 

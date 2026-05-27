@@ -1,506 +1,92 @@
-# Trading Bot
+# Trading Bot Workspace
 
-Production-grade multi-user algorithmic trading platform built with Python, FastAPI, PostgreSQL, Redis, Docker, and Binance WebSocket streams.
-
----
-
-# Vision
-
-Build a commercial-grade trading platform capable of supporting:
-
-- Multiple users
-- Multiple broker integrations
-- Real-money trading
-- Portfolio management
-- Risk management
-- Strategy deployment
-- Monitoring & observability
-- SaaS architecture
-
-The goal is to build a scalable trading product, not just a personal trading bot.
+A production-grade, commercial-ready algorithmic trading platform built with Node.js/Express, TypeScript, Prisma ORM, React, Redux, Redis event pipelines, and Dockerized PostgreSQL.
 
 ---
 
-# Current Status
+## Workspace Vision
 
-Current Phase:
-
-Phase 9.6 – Position Persistence
-
-Status:
-
-🚧 In Progress
-
-Next Phase:
-
-Phase 10A – Production Core Foundation
+This platform is architected to support:
+- **Multiple Users / Accounts**: Segregated portfolio, API keys, and margin management.
+- **Multi-Broker Framework**: Clean abstraction layers allowing dry paper trading or live deployment (e.g. Fyers integration).
+- **Scalable Algorithmic Execution**: High-throughput tick ingestion, real-time candle creation, and plug-and-play strategies.
+- **observability & Guardrails**: Integrated risk management checks, structured audit trails, and health diagnostics.
 
 ---
 
-# Current Features
+## Workspace Architecture
 
-## Infrastructure
-
-- FastAPI
-- PostgreSQL
-- Redis
-- Docker
-- AsyncIO
-- SQLAlchemy
-- Alembic Migrations
-
-## Market Data
-
-- Binance WebSocket Streaming
-- Multi-Symbol Support
-- Tick Processing
-- Live Candle Generation
-- 1m Candles
-- 5m Candles
-- 15m Candles
-
-## Strategy Engine
-
-- EMA Strategy
-- RSI Strategy
-- MACD Strategy
-- Strategy Registry
-- YAML Configuration
-
-## Execution
-
-- Broker Factory
-- Paper Broker
-- Risk Manager
-- Execution Engine
-- Portfolio Manager
-
-## Persistence
-
-- Orders
-- Trades
-- Candles
-- PostgreSQL Storage
-- Redis Event Pipeline
-
----
-
-# Architecture
-
-## Trading Flow
+This repository is structured as an npm workspaces monorepo:
 
 ```text
-Binance WebSocket
-        ↓
-Market Stream
-        ↓
-Tick Processor
-        ↓
-Strategy Engine
-        ↓
-Redis trading_signals
-        ↓
-Execution Engine
-        ↓
-Broker Factory
-        ↓
-Paper Broker
-        ↓
-Portfolio Manager
-        ↓
-PostgreSQL
-```
-
-## Candle Pipeline
-
-```text
-Market Stream
-        ↓
-Timeframe Candle Engine
-        ↓
-Redis candle_events
-        ↓
-Candle Persistence Runner
-        ↓
-PostgreSQL
-        ↓
-Candle API
+├── backend/            # Express REST/WS API & background worker runners (TypeScript)
+│   ├── src/
+│   │   ├── api/        # Routers, controllers, and middlewares
+│   │   ├── core/       # Configurations, logging, Prisma db, and Redis client
+│   │   ├── services/   # Business logic (PositionService, StrategyService, etc.)
+│   │   ├── repositories/# Direct DB access layer (CandleRepository, OrderRepository, etc.)
+│   │   ├── trading/    # Core algorithmic logic (brokers, strategies, portfolio, execution)
+│   │   └── workers/    # Continuous background worker runners
+│   └── prisma/         # PostgreSQL schema definition
+│
+├── frontend/           # SPA React client dashboard (Vite + TypeScript)
+│   ├── src/
+│   │   ├── components/ # Modular UI components (layout vs features/pages)
+│   │   ├── store/      # Redux toolkit state stores
+│   │   └── hooks/      # Custom state hooks (useTradingData)
+│
+├── legacy/             # Legaced archived files
+├── docker-compose.yml  # Root orchestrator for Postgres & Redis services
+└── package.json        # Workspace manager defining workspaces & concurrently dev runners
 ```
 
 ---
 
-# Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---------|------------|
-| Backend | Python |
-| API | FastAPI |
+| Backend API / WS | Node.js (TypeScript, Express) |
+| Frontend | React (TypeScript, Vite, Redux Toolkit) |
 | Database | PostgreSQL |
-| Cache / Messaging | Redis |
-| ORM | SQLAlchemy |
-| Migrations | Alembic |
-| Containers | Docker |
-| Market Data | Binance WebSocket |
-| Concurrency | AsyncIO |
+| Cache / Pub-Sub | Redis |
+| ORM | Prisma ORM |
+| Containers | Docker / Docker Compose |
+| Live Data Ingestion | Binance WebSocket Client |
 
 ---
 
-# Project Structure
+## Quick Start
 
-```text
-app/
-├── api/
-├── brokers/
-├── cache/
-├── candles/
-├── core/
-├── execution/
-├── models/
-├── portfolio/
-├── repositories/
-├── risk/
-├── services/
-├── strategy_engine/
-├── tasks/
-├── websockets/
-
-config/
-alembic/
-docs/
-tests/
-```
-
----
-
-# Active Services
-
-Run each service in a separate terminal.
-
-## Market Stream
-
+### 1. Database & Cache
 ```bash
-python -m app.tasks.stream_runner
+docker-compose up -d
 ```
 
-## Strategy Engine
-
+### 2. Install Dependencies
 ```bash
-python -m app.tasks.strategy_runner
+npm install
 ```
 
-## Execution Engine
-
+### 3. Run Dev Server
+Starts both the Express backend server (with its 5 background workers) and the React frontend concurrently:
 ```bash
-python -m app.tasks.execution_runner
-```
-
-## Candle Persistence
-
-```bash
-python -m app.tasks.candle_persistence_runner
-```
-
-## API
-
-```bash
-uvicorn app.main:app --reload
+npm run dev
 ```
 
 ---
 
-# Redis Channels
+## Workspace Verification
 
-```text
-market_ticks
-trading_signals
-candle_events
-```
+To verify that tests are running cleanly across the workspace:
 
----
-
-# API Endpoints
-
-## Root
-
-```http
-GET /
-```
-
-## Health
-
-```http
-GET /api/v1/health
-```
-
-## Candles
-
-```http
-GET /api/v1/candles?symbol=BTCUSDT&timeframe=1m
-```
-
-## Portfolio
-
-```http
-GET /api/v1/portfolio
-```
+* **Test Backend**: `npm run test --workspace=backend`
+* **Test Frontend**: `npm run test --workspace=frontend`
+* **Health API Check**: Request `http://localhost:8000/api/v1/health` in your browser.
 
 ---
 
-# Database
-
-Container:
-
-```text
-tradingbot-postgres
-```
-
-Connect:
-
-```bash
-docker exec -it tradingbot-postgres psql -U trader -d tradingbot
-```
-
----
-
-# Redis
-
-Container:
-
-```text
-tradingbot-redis
-```
-
-Connect:
-
-```bash
-redis-cli
-```
-
----
-
-# Completed Phases
-
-## Phase 1
-
-Infrastructure
-
-- FastAPI
-- PostgreSQL
-- Redis
-- Docker
-- Environment Configuration
-
-## Phase 2
-
-Core Backend
-
-- SQLAlchemy
-- Async Database
-- Alembic
-- Logging
-- Health APIs
-
-## Phase 3
-
-Trading Models
-
-- Orders
-- Trades
-- Strategies
-- Positions
-- Candles
-
-## Phase 4
-
-Market Data Layer
-
-- Binance WebSocket
-- Tick Processing
-- Candle Builder
-
-## Phase 5
-
-Strategy Engine
-
-- EMA
-- RSI
-- MACD
-- Signal Generation
-
-## Phase 6
-
-Execution Layer
-
-- Paper Broker
-- Execution Engine
-- Risk Manager
-- Portfolio Manager
-
-## Phase 7
-
-Persistence & Analytics
-
-- Orders
-- Trades
-- Backtesting
-- Analytics
-
-## Phase 8A
-
-Multi-Symbol Architecture
-
-- BTCUSDT
-- ETHUSDT
-- SOLUSDT
-
-## Phase 8B
-
-Live Candle Infrastructure
-
-- Multi-Timeframe Candles
-- Candle Repository
-- Candle Service
-- Candle API
-
-## Phase 9
-
-Redis Candle Event Pipeline
-
-## Phase 9.5
-
-Cleanup & Hardening
-
-- Candle Timestamp Persistence
-- Health Checks
-- Unique Constraints
-- Redis Cleanup
-
----
-
-# Current Work
-
-## Phase 9.6
-
-Position Persistence
-
-### Completed
-
-- Position Model Extended
-- stop_loss Added
-- take_profit Added
-- Position Migration Created
-
-### In Progress
-
-- Persist BUY Positions
-- Remove Positions On SELL
-- Position Repository
-- Position Service
-- Load Positions On Startup
-- Portfolio API DB-backed
-- Restart Recovery
-
-### Exit Criteria
-
-- Open positions survive restart
-- Portfolio API loads from database
-- Positions stored in PostgreSQL
-- No in-memory-only positions
-
----
-
-# Future Roadmap
-
-## Phase 10A
-
-Production Core Foundation
-
-- Audit Trail
-- Risk Controls
-- Service Recovery
-- Enhanced Health Checks
-- Idempotency Protection
-
-## Phase 10B
-
-Broker Framework
-
-- Broker Interface
-- Multi-Broker Support
-- Broker Factory Refactor
-
-## Phase 11
-
-Fyers Integration
-
-- Authentication
-- OAuth
-- Token Storage
-- REST Client
-- WebSocket Client
-
-## Phase 12
-
-User & Account System
-
-- Users
-- Accounts
-- Broker Accounts
-- Authentication
-- Authorization
-
-## Phase 13
-
-Portfolio Engine
-
-- Multi-User Portfolio
-- Exposure Management
-- Capital Allocation
-- Margin Tracking
-
-## Phase 14
-
-Observability
-
-- Prometheus
-- Grafana
-- Loki
-- Metrics
-- Alerting
-
-## Phase 15
-
-Dashboard
-
-- React Frontend
-- Live Charts
-- Portfolio Screen
-- Orders Screen
-- Trade Journal
-
-## Phase 16
-
-AI Layer
-
-- Feature Engineering
-- Prediction Models
-- Signal Ranking
-- Regime Detection
-
-## Phase 17
-
-Production Deployment
-
-- Nginx
-- CI/CD
-- Monitoring
-- Alerting
-- Backups
-- Disaster Recovery
-
----
-
-# License
+## License
 
 Private Project
 

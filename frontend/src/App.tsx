@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux';
 import { store } from './store';
-import ErrorBoundary from './components/ErrorBoundary';
-import AppLayout from './components/AppLayout';
+import ErrorBoundary from './components/layout/ErrorBoundary';
+import AppLayout from './components/layout/AppLayout';
 import { SnackbarProvider } from 'notistack';
 
 export default function App() {

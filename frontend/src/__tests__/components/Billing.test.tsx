@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import Billing from '../../components/Billing';
+import Billing from '../../components/features/Billing';
 
 describe('Billing Component', () => {
   it('renders all subscription tier headers', () => {
