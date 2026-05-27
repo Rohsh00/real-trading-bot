@@ -1,0 +1,116 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Candle {
+  id         String   @id @default(uuid()) @db.Uuid
+  symbol     String   @db.VarChar(20)
+  timeframe  String   @db.VarChar(10)
+  timestamp  DateTime @db.Timestamptz
+  open       Float
+  high       Float
+  low        Float
+  close      Float
+  volume     Float
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@unique([symbol, timeframe, timestamp], name: "uq_candle_symbol_timeframe_timestamp")
+  @@index([symbol])
+  @@index([timeframe])
+  @@index([timestamp])
+  @@map("candles")
+}
+
+model Order {
+  id                String   @id @default(uuid()) @db.Uuid
+  symbol            String   @db.VarChar(20)
+  side              String   @db.VarChar(10)
+  order_type        String   @db.VarChar(20)
+  quantity          Float
+  price             Float
+  status            String   @db.VarChar(20)
+  exchange_order_id String?  @db.VarChar(100)
+  created_at        DateTime @default(now()) @db.Timestamptz
+  updated_at        DateTime @default(now()) @updatedAt @db.Timestamptz
+  trades            Trade[]
+
+  @@index([status])
+  @@index([symbol])
+  @@map("orders")
+}
+
+model Position {
+  id             String   @id @default(uuid()) @db.Uuid
+  symbol         String   @unique @db.VarChar(20)
+  quantity       Float
+  average_price  Float
+  stop_loss      Float?
+  take_profit    Float?
+  unrealized_pnl Float    @default(0)
+  created_at     DateTime @default(now()) @db.Timestamptz
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@index([symbol])
+  @@map("positions")
+}
+
+model Strategy {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  config      Json
+  is_active   Boolean
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@index([name])
+  @@map("strategies")
+}
+
+model Trade {
+  id         String   @id @default(uuid()) @db.Uuid
+  order_id   String   @db.Uuid
+  symbol     String   @db.VarChar(20)
+  side       String   @db.VarChar(10)
+  quantity   Float
+  price      Float
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
+  order      Order    @relation(fields: [order_id], references: [id])
+
+  @@index([symbol])
+  @@map("trades")
+}
+
+model RiskSettings {
+  id                 String   @id @default(uuid()) @db.Uuid
+  name               String   @unique @db.VarChar(50)
+  max_position_size  Float
+  max_open_positions Int
+  max_daily_loss     Float
+  restricted_symbols Json
+  created_at         DateTime @default(now()) @db.Timestamptz
+  updated_at         DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@map("risk_settings")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  event_type String   @db.VarChar(50)
+  event_name String   @db.VarChar(100)
+  entity_id  String?  @db.VarChar(50)
+  details    Json?
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@index([entity_id])
+  @@index([event_type])
+  @@map("audit_logs")
+}

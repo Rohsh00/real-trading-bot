@@ -5,4 +5,5 @@ export enum TabEnum {
   CANDLES = 'candles',
   BACKTEST = 'backtest',
   BILLING = 'billing',
+  RISK = 'risk',
 }

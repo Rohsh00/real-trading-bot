@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.strategiesRouter = void 0;
+const express_1 = require("express");
+const strategies_controller_1 = require("../controllers/strategies.controller");
+exports.strategiesRouter = (0, express_1.Router)();
+exports.strategiesRouter.post("/", strategies_controller_1.StrategiesController.createStrategy);
+exports.strategiesRouter.get("/", strategies_controller_1.StrategiesController.listStrategies);
+exports.strategiesRouter.put("/:strategy_id", strategies_controller_1.StrategiesController.updateStrategy);
+exports.strategiesRouter.delete("/:strategy_id", strategies_controller_1.StrategiesController.deleteStrategy);

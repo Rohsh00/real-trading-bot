@@ -1,0 +1,45 @@
+{
+  "name": "trading-bot-backend",
+  "version": "1.0.0",
+  "description": "TypeScript Node.js backend for Trading Bot",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "concurrently \"nodemon --watch src --ext ts --exec ts-node src/main.ts\" \"nodemon --watch src --ext ts --exec ts-node src/workers/streamRunner.ts\" \"nodemon --watch src --ext ts --exec ts-node src/workers/candlePersistenceRunner.ts\" \"nodemon --watch src --ext ts --exec ts-node src/workers/strategyRunner.ts\" \"nodemon --watch src --ext ts --exec ts-node src/workers/executionRunner.ts\" \"nodemon --watch src --ext ts --exec ts-node src/workers/positionMonitor.ts\"",
+    "dev:api": "nodemon --watch src --ext ts --exec ts-node src/main.ts",
+    "dev:stream": "ts-node src/workers/streamRunner.ts",
+    "dev:persistence": "ts-node src/workers/candlePersistenceRunner.ts",
+    "dev:strategy": "ts-node src/workers/strategyRunner.ts",
+    "dev:execution": "ts-node src/workers/executionRunner.ts",
+    "dev:monitor": "ts-node src/workers/positionMonitor.ts",
+    "test": "jest tests/ --detectOpenHandles --forceExit"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "winston": "^3.13.0",
+    "ws": "^8.17.0",
+    "yaml": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
+    "@types/supertest": "^6.0.2",
+    "@types/ws": "^8.5.10",
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "prisma": "^5.14.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

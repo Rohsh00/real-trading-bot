@@ -69,6 +69,13 @@ export interface BrokerStatus {
   };
 }
 
+export interface RiskSettings {
+  max_position_size: number;
+  max_open_positions: number;
+  max_daily_loss: number;
+  restricted_symbols: string[];
+}
+
 export interface TradingState {
   cashBalance: number;
   realizedPnl: number;
@@ -79,6 +86,7 @@ export interface TradingState {
   signals: Signal[];
   orders: Order[];
   brokerStatus: BrokerStatus | null;
+  riskSettings: RiskSettings | null;
   isHealthOk: boolean;
   loading: boolean;
   errorMsg: string | null;
@@ -94,6 +102,7 @@ const initialState: TradingState = {
   signals: [],
   orders: [],
   brokerStatus: null,
+  riskSettings: null,
   isHealthOk: true,
   loading: false,
   errorMsg: null,
@@ -217,7 +226,7 @@ export const fetchBrokerStatusThunk = createAsyncThunk(
   }
 );
 
-interface DeployStrategyPayload {
+export interface DeployStrategyPayload {
   name: string;
   description: string;
   config: Record<string, unknown>;
@@ -282,6 +291,41 @@ export const deleteStrategyThunk = createAsyncThunk(
       return await res.json();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Strategy deletion failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const fetchRiskSettingsThunk = createAsyncThunk(
+  'trading/fetchRiskSettings',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/risk`);
+      if (!res.ok) throw new Error('Failed to fetch risk settings');
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown risk settings connection error';
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const updateRiskSettingsThunk = createAsyncThunk(
+  'trading/updateRiskSettings',
+  async (payload: Partial<RiskSettings>, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_BASE}/risk`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to update risk settings');
+      }
+      return await res.json();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Risk settings update failed';
       return rejectWithValue(message);
     }
   }
@@ -360,6 +404,16 @@ const tradingSlice = createSlice({
       // Broker Status
       .addCase(fetchBrokerStatusThunk.fulfilled, (state, action) => {
         state.brokerStatus = action.payload;
+      })
+      // Risk Settings
+      .addCase(fetchRiskSettingsThunk.fulfilled, (state, action) => {
+        state.riskSettings = action.payload;
+      })
+      .addCase(updateRiskSettingsThunk.fulfilled, (state, action) => {
+        state.riskSettings = action.payload;
+      })
+      .addCase(updateRiskSettingsThunk.rejected, (state, action) => {
+        state.errorMsg = action.payload as string;
       });
   },
 });

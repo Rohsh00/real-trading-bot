@@ -38,9 +38,11 @@ Status:
 
 🚧 In Progress
 
-Next Phase:
+Phase 12 (Multi-User Architecture)
 
-Phase 10B (Broker Framework)
+Status:
+
+⏳ Pending
 
 ---
 
@@ -70,11 +72,13 @@ Phase 10B (Broker Framework)
 
 ✅ Phase 9.6 Complete
 
-🚧 Phase 10A In Progress
+✅ Phase 10A Complete
 
-⏳ Phase 10B Pending
+✅ Phase 10B Complete
 
-⏳ Phase 11 Pending
+✅ Phase 11 Complete
+
+⏳ Phase 12 Pending
 
 ---
 
@@ -342,21 +346,40 @@ Exit Criteria:
 
 ---
 
+# Strategy Engine Upgrade
+
+Status:
+
+✅ Complete
+
+Problem:
+
+Strategy manager and registry used hardcoded mapping for `EMACrossoverStrategy`, `RSIStrategy`, and `MACDStrategy`. Adding new strategies required modifying core engine files.
+
+Current State:
+
+- `BaseStrategy` implements `__init_subclass__` auto-registration.
+- `StrategyRegistry` dynamically discovers and imports strategy classes using `pkgutil` and `importlib`.
+- `StrategyManager` dynamically instantiates active strategies via `BaseStrategy.create()`.
+- Adding a new strategy only requires creating a file in `app/strategies/` inheriting from `BaseStrategy`.
+
+---
+
 # Current Sprint
 
 Phase 10A Production Core Foundation
 
 Tasks:
 
-1. Audit Trail
+✅ 1. Audit Trail
 
 2. Risk Controls
 
-3. Service Recovery
+✅ 3. Service Recovery
 
-4. Enhanced Health Checks
+✅ 4. Enhanced Health Checks
 
-5. Idempotency Protection
+✅ 5. Idempotency Protection
 
 Exit Criteria:
 
@@ -441,7 +464,7 @@ Tasks:
 
 Status:
 
-⏳ Pending
+✅ Complete
 
 Blocked By:
 
@@ -455,13 +478,13 @@ Broker Framework
 
 Tasks:
 
-- Broker Interface
-- Multi-Broker Support
-- Broker Factory Refactor
+✅ Broker Interface
+✅ Multi-Broker Support
+✅ Broker Factory Refactor
 
 Status:
 
-⏳ Pending
+✅ Complete
 
 Blocked By:
 
@@ -475,16 +498,16 @@ Fyers Integration
 
 Tasks:
 
-- Authentication
-- OAuth
-- Token Storage
-- Refresh Token Management
-- REST Client
-- WebSocket Client
+✅ Authentication
+✅ OAuth
+✅ Token Storage
+✅ Refresh Token Management
+✅ REST Client
+✅ WebSocket Client (Deferred - Binance handles market data)
 
 Status:
 
-⏳ Pending
+✅ Complete
 
 Blocked By:
 
@@ -634,29 +657,31 @@ System Status:
 
 ✅ Position Persistence Verified
 
+✅ Dynamic Strategy Discovery Operational
+
+✅ Audit Trail Operational
+
+✅ Service Recovery Operational (Python-level auto-restarts)
+
 Current Alembic Revision:
 
-579ce828767e
+b3399a986e58
 
 Current Focus:
 
-Phase 10A Production Core Foundation
+Phase 12 Multi-User Architecture
 
-Do NOT start Broker Integration until Phase 10A is complete.
-
-Do NOT start Multi-User Architecture until Broker Framework is complete.
+Do NOT start Advanced Risk Management until Multi-User Architecture is complete.
 
 Next Immediate Tasks:
 
-1. Design & Implement Audit Trail
+✅ 1. Add Risk Controls
 
-2. Add Risk Controls
+✅ 2. Implement Service Recovery
 
-3. Implement Service Recovery
+✅ 4. Add Enhanced Health Checks
 
-4. Add Enhanced Health Checks
-
-5. Add Idempotency Protection
+✅ 5. Add Idempotency Protection
 
 Project Goal:
 
